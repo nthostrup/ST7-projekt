@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(15).name);  
+XML = XMLECGParser(xmlfiles(5).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -35,7 +35,7 @@ VCG_T = ecg*T; %transformed VCG
 scatter3(VCG_T(On:Off,1),VCG_T(On:Off,3),-VCG_T(On:Off,2),'r','.')
 axis square
 axis equal
-axl=100; %axislength
+axl=200; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
 xlabel('x');
@@ -78,19 +78,21 @@ Z=solve(planeeq==0,z);
 fsurf(Z,'FaceColor','y','EdgeColor','none','facealpha',0.2)
 
 %% Electrodes
-p = [0;0;0]; %origo 
+Ori = [0;0;0]; %origo 
 c=5; %konstant til at forlænge pseudoleads
 
-V1=[VCGavg(1)+U(1,1)*S(1,1)*c VCGavg(2)+U(2,1)*S(1,1)*c VCGavg(3)+U(3,1)*S(1,1)*c];
+P1=[VCGavg(1)+U(1,1)*S(1,1)*c VCGavg(2)+U(2,1)*S(1,1)*c VCGavg(3)+U(3,1)*S(1,1)*c]; %lead som de andre leads tager udgangspunkt i 
+
 %Beregn elektrodepunkter fra origo til punkter på planet 
-for i=1:36  %obs bør det være 0:35 eller 2:34 
+P(1,:)=P1;
+for i=1:35  
     theta(i) = 10*i*pi/180;
-    V(i,:) = V1*cos(theta(i)) +cross(U(:,3),V1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),V1)*(1-cos(theta(i))); %Rodrigues formel 
+    P(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
 end
 
 %Plot pseudoleads
 for i=1:36
-   plot3([p(1) V(i,1)],[p(2) V(i,2)], [p(3) V(i,3)],'g') 
+   plot3([Ori(1) P(i,1)],[Ori(2) P(i,2)], [Ori(3) P(i,3)],'g') 
 end
 
 
@@ -98,21 +100,33 @@ end
 %Indtil videre beregnes kun for lead 1. Der er heller ikke inkoorporeret
 %den "negative længde"
 
-lead=V1'; 
-
-for i=1:length(VCG_T)
-pointvec=VCG_T(:,i); 
-projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead. 
-
-end
-
-for i=1:length(VCG_T)
-  projlength(i)=sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder
-end
-
-% figure()
-plot3([p(1) lead(1)],[p(2) lead(2)],[p(3) lead(3)],'LineWidth',2); %plot den valgte lead 
-
+%lead=P(1,:)'; 
 figure()
-plot(projlength)%2d plot på afledning 
+for j=1:length(P)/2 %ser kun på 180 grader
+    lead=P(j,:)';
+    for i=1:length(VCG_T)
+        pointvec=VCG_T(:,i);
+        projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
+        leadprojvec(j,i,:)=projvec(i,:);
+        
+        if dot(projvec(i,:),lead)<0
+            projlength(i)=-sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder
+            leadprojlength(j,i)=projlength(i);
+        else
+            projlength(i)=sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder
+            leadprojlength(j,i)=projlength(i);
+        end
+    end
+    
+    plot(leadprojlength(j,:)); hold on; 
+end
 
+%% Plot projecerede leads (forældet ift. gem af data i 3d) 
+%figure()
+% plot3([Ori(1) lead(1)],[Ori(2) lead(2)],[Ori(3) lead(3)],'LineWidth',2); %plot den valgte lead 
+% %plot projection 
+% p_index=1; 
+% plot3([Ori(1) projvec(p_index,1)],[Ori(2) projvec(p_index,2)],[Ori(3) projvec(p_index,3)],'LineWidth',2);
+% 
+% figure()
+% plot(projlength)%2d plot på afledning 
