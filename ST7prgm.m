@@ -128,8 +128,8 @@ end
 
 %lead=P(1,:)'; 
 figure()
-for j=1:length(P)/2 %ser kun på 180 grader
-    lead=P(j,:)';
+for j=1:length(P_new)/2 %ser kun på 180 grader
+    lead=P_new(j,:)';
     for i=1:length(VCG_T)
         pointvec=VCG_T(:,i);
         projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
