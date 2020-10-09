@@ -3,7 +3,7 @@
 function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop] = detectionFile(ecg, POnset, POffset)   
 
 % p_iab kan være 0 eller 1 og indikere om subjekt har partiel IAB. 
-% biphasic_p_wave er en 1*M vektor og angiver om p-bølgen er bifasisk i henholdvis ecg(:,1), ecg(:,2) osv....
+% biphasic_p_wave er en 1*M vektor og angiver om p-bølgen er bifasisk i henholdvis lead II, aVF og III.
 % sum_p_loop er den den integrerede p-loop(den positive del) ift regressionslinjen i enheden [mikroV*mS]
 % sum_p_inv_loop er den den integrerede p'-loop(den negative del) ift regressionslinjen i enheden [mikroV*mS]
 
@@ -32,15 +32,15 @@ end
 
 %kan plottes med følgende udkommenterede: (figur 1 er lead II, figur 2 er lead aVF, figur 3 er lead III)
 figure(nr), subplot(2,1,1)          
-% plot(P_loop)
-% hold on 
-% t=[1:length(P_loop)];
-% x= [P(1,1):P(1,2)];
-% plot(t,a(nr)*x+b(nr))
-% legend('oprindelige p-loop')
-% subplot(2,1,2)
-% plot(P_ecg_aligned)
-% legend('modificeret p-loop uden hældning') %note: p_onset og p_offset er nu det samme efter fratrækning af regressionen. 
+plot(P_loop)
+hold on 
+t=[1:length(P_loop)];
+x= [P(1,1):P(1,2)];
+plot(t,a(nr)*x+b(nr))
+legend('oprindelige p-loop')
+subplot(2,1,2)
+plot(P_ecg_aligned)
+legend('modificeret p-loop uden hældning') %note: p_onset og p_offset er nu det samme efter fratrækning af regressionen. 
 
 % beregning af integralet af p-loopet
 sum_p_loop(nr) = 0;                             % Integralet af P
