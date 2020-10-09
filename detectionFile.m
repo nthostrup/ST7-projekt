@@ -1,15 +1,13 @@
-% funktionen for detektion ved brug af XML-fil  - mangler at summere med trapez. 
+% funktionen for detektion ved brug af fil med ECG (hvor kolonner er leads )  
 
-function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop] = detectionXML(XML)   
+function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop] = detectionFile(ecg, POnset, POffset)   
 
 % p_iab kan være 0 eller 1 og indikere om subjekt har partiel IAB. 
 % biphasic_p_wave er en 1*3 vektor og angiver om p-bølgen er bifasisk i henholdvis lead II, aVF og III.
 % sum_p_loop er den den integrerede p-loop(den positive del) ift regressionslinjen i enheden [mikroV*mS]
 % sum_p_inv_loop er den den integrerede p'-loop(den negative del) ift regressionslinjen i enheden [mikroV*mS]
 
-% Henter data fra XML-filen
-ecg = [XML.MedianECG.II XML.MedianECG.aVF XML.MedianECG.III]; % initialisere den inferiore afledninger
-P=[XML.TestInfo.POnset XML.TestInfo.POffset];       % Vektor med P_onset og P_Offset
+P=[POnset POffset];       % Vektor med P_onset og P_Offset
 
 [r,c] = size(ecg);
 
@@ -89,4 +87,3 @@ end
 end
 end
 
-% lav trapez sumering istedet. 
