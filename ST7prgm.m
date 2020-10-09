@@ -28,7 +28,10 @@ T=[-0.130 0.050 -0.010 0.140 0.060 0.540 0.380 -0.07;
 
 %% Transformation
 ecg = [XML.MedianECG.V1 XML.MedianECG.V2 XML.MedianECG.V3 XML.MedianECG.V4 XML.MedianECG.V5 XML.MedianECG.V6 XML.MedianECG.I XML.MedianECG.II]; %Sætter EKG i rigtig rækkefølge ift. transformering
-VCG_T = ecg*T; %transformed VCG
+III=XML.MedianECG.III;
+aVF=XML.MedianECG.aVF;
+
+VCG_T = (ecg*T); %transformed VCG
 
 % Plot VCG + axis 
  figure()
@@ -77,7 +80,11 @@ Z=solve(planeeq==0,z);
 
 fsurf(Z,'FaceColor','y','EdgeColor','none','facealpha',0.2)
 
-%% Electrodes
+
+%% PCA origo 
+%pcaorig=solve(dot(pcaorig(:,3),[x,y,z]-VCGavg'==0),pcaorig);
+
+%% Electrodes ift. origo 
 Ori = [0;0;0]; %origo 
 c=5; %konstant til at forlænge pseudoleads
 
@@ -90,10 +97,29 @@ for i=1:35
     P(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
 end
 
+pcaorig=sum(P,1)/length(P);
+%plot3([0 U(1,3)*20],[0 U(2,3)*20],[0 U(3,3)*20]);
+plot3([0 pcaorig(1)],[0 pcaorig(2)],[0 pcaorig(3)]);
+
 %Plot pseudoleads
 for i=1:36
-   plot3([Ori(1) P(i,1)],[Ori(2) P(i,2)], [Ori(3) P(i,3)],'g') 
+   plot3([pcaorig(1) P(i,1)],[pcaorig(2) P(i,2)], [pcaorig(3) P(i,3)],'g') 
 end
+
+%% plot 
+VCG_T=VCG_T-pcaorig';
+scatter3(VCG_T(1,:),VCG_T(2,:),VCG_T(3,:),'r','.')
+
+%% Electrodes ift. PCA(0,0,0)
+
+for i=1:36
+    P_new(i,:)=P(i,:)-pcaorig;
+end
+
+for i=1:36
+   plot3([0 P_new(i,1)],[0 P_new(i,2)], [0 P_new(i,3)],'g') 
+end
+
 
 
 %% Projection 
@@ -117,16 +143,15 @@ for j=1:length(P)/2 %ser kun på 180 grader
             leadprojlength(j,i)=projlength(i);
         end
     end
-    
+    subplot(2,1,1)
     plot(leadprojlength(j,:)); hold on; 
+    axis square 
 end
 
-%% Plot projecerede leads (forældet ift. gem af data i 3d) 
-%figure()
-% plot3([Ori(1) lead(1)],[Ori(2) lead(2)],[Ori(3) lead(3)],'LineWidth',2); %plot den valgte lead 
-% %plot projection 
-% p_index=1; 
-% plot3([Ori(1) projvec(p_index,1)],[Ori(2) projvec(p_index,2)],[Ori(3) projvec(p_index,3)],'LineWidth',2);
-% 
-% figure()
-% plot(projlength)%2d plot på afledning 
+subplot(2,1,2) 
+plot(ecg(On:Off));hold on;
+plot(III(On:Off));
+plot(aVF(On:Off));
+axis square
+
+
