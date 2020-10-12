@@ -1,4 +1,4 @@
-function [leadprojlength] = PseudoLeadsCalc(VCG_in)
+function [leadprojlength, Pseudo_electrodes] = PseudoLeadsCalc(VCG_in)
 
 %Arrange axis correct as by convention
 VCG_T=[VCG_in(:,1) VCG_in(:,3) -VCG_in(:,2)];
@@ -29,14 +29,14 @@ Z=solve(planeeq==0,z);
 P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
 
 %Beregn elektrodepunkter fra origo til punkter på planet 
-P(1,:)=P1;
+Pseudo_electrodes(1,:)=P1;
 for i=1:35  
     theta(i) = 10*i*pi/180;
-    P(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
+    Pseudo_electrodes(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
 end
 
 %% Beregner pseudoleads ift PCA(0,0,0)
-pcaorig=sum(P,1)/length(P); %bestemmer punkt på plan som er vinkelret til origo
+pcaorig=sum(Pseudo_electrodes,1)/length(Pseudo_electrodes); %bestemmer punkt på plan som er vinkelret til origo
 
 %% Plot data med PCA-origo 
 VCG_T_pca=VCG_T-pcaorig';
@@ -44,7 +44,7 @@ VCG_T_pca=VCG_T-pcaorig';
 %% Electrodes ift. PCA(0,0,0)
 
 for i=1:36
-    P_pca(i,:)=P(i,:)-pcaorig;
+    P_pca(i,:)=Pseudo_electrodes(i,:)-pcaorig;
 end
 
 %% Projection 
