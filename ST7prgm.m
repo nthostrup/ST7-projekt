@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(1).name);  
+XML = XMLECGParser(xmlfiles(15).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -146,7 +146,8 @@ for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders lead
         end
     end
     subplot(2,1,1)
-    plot(leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
+    plot(leadprojlength(j,:));   %plotter j-lead-projectioner af alle datapunkter  
+    hold on;
     axis square 
 end
 title('Pseudoprojectioner')
