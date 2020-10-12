@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(2).name);  
+XML = XMLECGParser(xmlfiles(1).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -42,10 +42,10 @@ axis equal
 axl=200; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
-xlabel('x');
-ylabel('y');
-zlabel('z');
-title('3D plot');
+xlabel('x [µV]');
+ylabel('y [µV]');
+zlabel('z [µV]');
+title('3D plot of p-loop');
 hold on
 
 str = axl;
