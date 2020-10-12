@@ -49,14 +49,14 @@ end
 
 %% Projection 
 
-for i=1:9
+for i=1:10
 inf_p_leads1(i,:) = P_pca(i,:);
 end
-for i=28:36
+for i=29:36
 inf_p_leads2(i,:) = P_pca(i,:);
 end
 
-inf_p_leads = [inf_p_leads2(28:36,:);inf_p_leads1(1:9,:)];
+inf_p_leads = [inf_p_leads2(29:36,:);inf_p_leads1(1:10,:)];
 
 for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
     lead=inf_p_leads(j,:)'; 
