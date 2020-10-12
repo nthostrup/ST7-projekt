@@ -126,7 +126,7 @@ for i=29:36
 inf_p_leads2(i,:) = P_pca(i,:);
 end
 
-inf_p_leads = [inf_p_leads2(28:36,:);inf_p_leads1(1:9,:)];
+inf_p_leads = [inf_p_leads2(29:36,:);inf_p_leads1(1:10,:)];
 for i=1:18
  plot3([0 inf_p_leads(i,1)],[0 inf_p_leads(i,2)], [0 inf_p_leads(i,3)],'y') %plotter pseudoleads i PC1-2-plan 
 end
