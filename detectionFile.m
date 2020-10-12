@@ -31,7 +31,7 @@ for i=1:1:length(P_loop)
 end
 
 %kan plottes med følgende udkommenterede: (figur 1 er lead II, figur 2 er lead aVF, figur 3 er lead III)
-figure(nr), subplot(2,1,1)          
+%figure(nr), subplot(2,1,1)          
 % plot(P_loop)
 % hold on 
 % t=[1:length(P_loop)];
