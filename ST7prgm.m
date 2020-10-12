@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(15).name);  
+XML = XMLECGParser(xmlfiles(1).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -39,7 +39,7 @@ figure()
 scatter3(VCG_T(:,1),VCG_T(:,2),VCG_T(:,3),'r','.') %VCG_T er allerede vendt korrekt ift. [x,z,-y]
 axis square
 axis equal
-axl=200; %axislength
+axl=130; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
 xlabel('x [µV]');
@@ -82,9 +82,8 @@ fsurf(Z,'FaceColor','y','EdgeColor','none','facealpha',0.2)
 
 
 %% Electrodeplacering ift origo 
-c=5; %konstant til at forlænge pseudoleads
 
-P1=[VCGavg(1)+U(1,1)*S(1,1)*c VCGavg(2)+U(2,1)*S(1,1)*c VCGavg(3)+U(3,1)*S(1,1)*c]; %lead som de andre leads tager udgangspunkt i 
+P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
 
 %Beregn elektrodepunkter fra origo til punkter på planet 
 P(1,:)=P1;
@@ -146,8 +145,7 @@ for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders lead
         end
     end
     subplot(2,1,1)
-    plot(leadprojlength(j,:));   %plotter j-lead-projectioner af alle datapunkter  
-    hold on;
+    plot(leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
     axis square 
 end
 title('Pseudoprojectioner')
