@@ -59,7 +59,7 @@ for j=29:36
     inf_p_leads2(j,:) = P_pca(j,:);
 end
 
-inf_p_leads = [inf_p_leads2(29:36,:);inf_p_leads1(1:10,:)];
+inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];
 
 for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
     lead=inf_p_leads(j,:)'; 
