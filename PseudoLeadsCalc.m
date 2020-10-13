@@ -1,4 +1,4 @@
-function [leadprojlength, Pseudo_electrodes] = PseudoLeadsCalc(VCG_in)
+function [leadprojlength, Pseudo_electrodes, numerationOfElectrodes] = PseudoLeadsCalc(VCG_in)
 
 %Arrange axis correct as by convention
 VCG_T=[VCG_in(:,1) VCG_in(:,3) -VCG_in(:,2)];
@@ -48,12 +48,15 @@ for i=1:36
 end
 
 %% Projection 
-
+numerationOfElectrodes = zeros(1,18);
 for i=1:10
-inf_p_leads1(i,:) = P_pca(i,:);
+    numerationOfElectrodes(i) = i;
+    inf_p_leads1(i,:) = P_pca(i,:);
 end
-for i=29:36
-inf_p_leads2(i,:) = P_pca(i,:);
+for j=29:36
+    i = i+1;
+    numerationOfElectrodes(i) = j;
+    inf_p_leads2(j,:) = P_pca(j,:);
 end
 
 inf_p_leads = [inf_p_leads2(29:36,:);inf_p_leads1(1:10,:)];
