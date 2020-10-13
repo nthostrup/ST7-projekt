@@ -50,12 +50,12 @@ end
 %% Projection 
 numerationOfElectrodes = zeros(1,18);
 for i=1:10
-    numerationOfElectrodes(i) = i;
+    numerationOfElectrodes(i) = 37-i;
     inf_p_leads1(i,:) = P_pca(i,:);
 end
 for j=29:36
     i = i+1;
-    numerationOfElectrodes(i) = j;
+    numerationOfElectrodes(i) = 37-j;
     inf_p_leads2(j,:) = P_pca(j,:);
 end
 
