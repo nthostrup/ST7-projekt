@@ -8,13 +8,14 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(1).name);  
+XML = XMLECGParser(xmlfiles(2).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
 Off=XML.TestInfo.POffset;
 %On=1;
 %Off=length(VCG_T);
+time = XML.MedianECG.time(On:Off);
 
 % Invers Dower 
 % T=[-0.172,-0.073,0.122,0.231,0.239,0.193,0.156,-0.009;
@@ -39,13 +40,13 @@ figure()
 scatter3(VCG_T(:,1),VCG_T(:,2),VCG_T(:,3),'r','.') %VCG_T er allerede vendt korrekt ift. [x,z,-y]
 axis square
 axis equal
-axl=130; %axislength
+axl=200; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
 xlabel('x [µV]');
 ylabel('y [µV]');
 zlabel('z [µV]');
-title('3D plot of p-loop');
+title('3D plot of P-loop');
 hold on
 
 str = axl;
@@ -126,10 +127,20 @@ for i=29:36
 inf_p_leads2(i,:) = P_pca(i,:);
 end
 
-inf_p_leads = [inf_p_leads2(29:36,:);inf_p_leads1(1:10,:)];
+inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];     % 1 =vektor til PC1
 for i=1:18
  plot3([0 inf_p_leads(i,1)],[0 inf_p_leads(i,2)], [0 inf_p_leads(i,3)],'y') %plotter pseudoleads i PC1-2-plan 
 end
+hold on
+% text(inf_p_leads2(29,1),inf_p_leads2(29,2),inf_p_leads2(29,3),'inf-p-leads2(29)');
+% text(P(1,1),P(1,2),P(1,3),'P(1)');
+% text(P(2,1),P(2,2),P(2,3),'P(2)');
+% text(P(5,1),P(5,2),P(5,3),'P(5)');
+% text(P(30,1),P(30,2),P(30,3),'P(30)');
+% text(inf_p_leads(1,1),inf_p_leads(1,2),inf_p_leads(1,3),'inf-p-leads(1)');
+% text(inf_p_leads(5,1),inf_p_leads(10,2),inf_p_leads(10,3),'inf-p-leads(10)');
+
+
 
 figure()
 for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
@@ -148,11 +159,13 @@ for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders lead
         end
     end
     subplot(2,1,1)
-    plot(leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
+    plot(time,leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
     axis square 
+    xlabel('Time [ms]')
+    ylabel('Amplitude [µV]')
 end
-title('Pseudoprojectioner')
-legend('0','10','20','30','40','50','60','70','80','90','100','110','120','130','140','150','160','170');
+title('Projections on the pseudoleads')
+legend('0°','10°','20°','30°','40°','50°','60°','70°','80°','90°','100°','110°','120°','130°','140°','150°','160°','170°');
 
 subplot(2,1,2) %konventionelle leads til sammenligning
 plot(ecg(On:Off,8));hold on;
@@ -161,5 +174,8 @@ plot(aVF(On:Off));
 title('Konventionelle leads')
 legend('II','III','aVF');
 axis square
+    xlabel('Time [ms]')
+    ylabel('Amplitude [µV]')
+
 
 
