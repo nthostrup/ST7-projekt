@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(5).name);  
+XML = XMLECGParser(xmlfiles(1).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -32,18 +32,20 @@ III=XML.MedianECG.III;
 aVF=XML.MedianECG.aVF;
 
 VCG_T = (ecg*T); %transformed VCG
+VCG_T=[VCG_T(On:Off,1) VCG_T(On:Off,3) (-VCG_T(On:Off,2))];
 
 % Plot VCG + axis 
- figure()
-scatter3(VCG_T(On:Off,1),VCG_T(On:Off,3),-VCG_T(On:Off,2),'r','.')
+figure()
+scatter3(VCG_T(:,1),VCG_T(:,2),VCG_T(:,3),'r','.') %VCG_T er allerede vendt korrekt ift. [x,z,-y]
 axis square
 axis equal
-axl=200; %axislength
+axl=130; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
-xlabel('x');
-ylabel('y');
-zlabel('z');
+xlabel('x [µV]');
+ylabel('y [µV]');
+zlabel('z [µV]');
+title('3D plot of p-loop');
 hold on
 
 str = axl;
@@ -51,9 +53,7 @@ plot3([-str str],[0 0],[0 0],'k',[0 0],[-str str],[0 0],'k',[0 0],[0 0],[-str st
 text(str,0,0,'Left'); text(-str,0,0,'Right'); text(0,str,0,'Posterior'); text(0,-str,0,'Anterior'); text(0,0,str,'Superior'); text(0,0,-str,'Inferior');
 
 %% PCA 
-VCG_T=[VCG_T(On:Off,1) VCG_T(On:Off,3) (-VCG_T(On:Off,2))];
 VCG_T=VCG_T';
-
 nPoints = length(VCG_T);
 
 VCGavg = mean(VCG_T,2);               % Compute mean of rows 
@@ -81,14 +81,9 @@ Z=solve(planeeq==0,z);
 fsurf(Z,'FaceColor','y','EdgeColor','none','facealpha',0.2)
 
 
-%% PCA origo 
-%pcaorig=solve(dot(pcaorig(:,3),[x,y,z]-VCGavg'==0),pcaorig);
+%% Electrodeplacering ift origo 
 
-%% Electrodes ift. origo 
-Ori = [0;0;0]; %origo 
-c=5; %konstant til at forlænge pseudoleads
-
-P1=[VCGavg(1)+U(1,1)*S(1,1)*c VCGavg(2)+U(2,1)*S(1,1)*c VCGavg(3)+U(3,1)*S(1,1)*c]; %lead som de andre leads tager udgangspunkt i 
+P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
 
 %Beregn elektrodepunkter fra origo til punkter på planet 
 P(1,:)=P1;
@@ -97,61 +92,74 @@ for i=1:35
     P(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
 end
 
-pcaorig=sum(P,1)/length(P);
-%plot3([0 U(1,3)*20],[0 U(2,3)*20],[0 U(3,3)*20]);
-plot3([0 pcaorig(1)],[0 pcaorig(2)],[0 pcaorig(3)]);
+%% Beregner pseudoleads ift PCA(0,0,0)
+pcaorig=sum(P,1)/length(P); %bestemmer punkt på plan som er vinkelret til origo
+
+plot3([0 pcaorig(1)],[0 pcaorig(2)],[0 pcaorig(3)]); %plotter normalvektor til plan som rammer origo 
 
 %Plot pseudoleads
 for i=1:36
    plot3([pcaorig(1) P(i,1)],[pcaorig(2) P(i,2)], [pcaorig(3) P(i,3)],'g') 
 end
 
-%% plot 
-VCG_T=VCG_T-pcaorig';
-scatter3(VCG_T(1,:),VCG_T(2,:),VCG_T(3,:),'r','.')
+%% Plot data med PCA-origo 
+VCG_T_pca=VCG_T-pcaorig';
+
+scatter3(VCG_T_pca(1,:),VCG_T_pca(2,:),VCG_T_pca(3,:),'b','.')
 
 %% Electrodes ift. PCA(0,0,0)
 
 for i=1:36
-    P_new(i,:)=P(i,:)-pcaorig;
+    P_pca(i,:)=P(i,:)-pcaorig;
 end
 
 for i=1:36
-   plot3([0 P_new(i,1)],[0 P_new(i,2)], [0 P_new(i,3)],'g') 
+   plot3([0 P_pca(i,1)],[0 P_pca(i,2)], [0 P_pca(i,3)],'c') %plotter pseudoleads i PC1-2-plan 
 end
 
-
-
 %% Projection 
-%Indtil videre beregnes kun for lead 1. Der er heller ikke inkoorporeret
-%den "negative længde"
 
-%lead=P(1,:)'; 
+for i=1:10
+inf_p_leads1(i,:) = P_pca(i,:);
+end
+for i=29:36
+inf_p_leads2(i,:) = P_pca(i,:);
+end
+
+inf_p_leads = [inf_p_leads2(29:36,:);inf_p_leads1(1:10,:)];
+for i=1:18
+ plot3([0 inf_p_leads(i,1)],[0 inf_p_leads(i,2)], [0 inf_p_leads(i,3)],'y') %plotter pseudoleads i PC1-2-plan 
+end
+
 figure()
-for j=1:length(P_new)/2 %ser kun på 180 grader
-    lead=P_new(j,:)';
-    for i=1:length(VCG_T)
-        pointvec=VCG_T(:,i);
+for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
+    lead=inf_p_leads(j,:)'; 
+    for i=1:length(VCG_T_pca) %gennemløber length(VCG_T_pca) antal datapunkter
+        pointvec=VCG_T_pca(:,i); %vektoren som skal projekteres er det PC-plans-korrigerede punkt. 
         projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
-        leadprojvec(j,i,:)=projvec(i,:);
+        leadprojvec(j,i,:)=projvec(i,:); %gemmer den beregnede projekterede vektor (i) i den tilhørende lead (j) 
         
-        if dot(projvec(i,:),lead)<0
-            projlength(i)=-sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder
+        if dot(projvec(i,:),lead)<0 %Sørger for at gøre modsatrettet projection negativ vha. dot-product
+            projlength(i)=-sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder. Negativ pga modsatrettet. 
             leadprojlength(j,i)=projlength(i);
         else
-            projlength(i)=sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder
+            projlength(i)=sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); 
             leadprojlength(j,i)=projlength(i);
         end
     end
     subplot(2,1,1)
-    plot(leadprojlength(j,:)); hold on; 
+    plot(leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
     axis square 
 end
+title('Pseudoprojectioner')
+legend('0','10','20','30','40','50','60','70','80','90','100','110','120','130','140','150','160','170');
 
-subplot(2,1,2) 
-plot(ecg(On:Off));hold on;
+subplot(2,1,2) %konventionelle leads til sammenligning
+plot(ecg(On:Off,8));hold on;
 plot(III(On:Off));
 plot(aVF(On:Off));
+title('Konventionelle leads')
+legend('II','III','aVF');
 axis square
 
 
