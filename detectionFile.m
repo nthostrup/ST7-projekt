@@ -68,12 +68,10 @@ end
 
 % Detection af bifasisk p-bølge
 biphasic_p_wave(nr) = 0;                    % Initialiseres og sættes til 0.
-if  sum_p_inv_loop(nr)<=-160                % Treshold er 160 mikroV*mS           
+if  (sum_p_inv_loop(nr)<=-160 && sum_p_loop(nr) >= 160)               % Treshold er 160 mikroV*mS           
     biphasic_p_wave(nr)=1;
 end 
-if  sum_p_inv_loop(nr)>-160
-    biphasic_p_wave(nr)=0;
-end 
+
 
 % Detection af partiel IAB - detectionen af p-IAB er den samme for alle
 % leads. 
