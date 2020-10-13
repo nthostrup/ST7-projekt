@@ -7,7 +7,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 
 %% Define dataset, transformation type and interval
 
-%Angiv den konkrete fil der skal kï¿½res i scriptet ved index af xmlfiler
+%Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
 XML = XMLECGParser(xmlfiles(2).name);  
 
 % Define part of ECG
@@ -28,7 +28,7 @@ T=[-0.130 0.050 -0.010 0.140 0.060 0.540 0.380 -0.07;
      -0.430 -0.06 -0.140 -0.20 -0.110 0.310 0.110 -0.23]';
 
 %% Transformation
-ecg = [XML.MedianECG.V1 XML.MedianECG.V2 XML.MedianECG.V3 XML.MedianECG.V4 XML.MedianECG.V5 XML.MedianECG.V6 XML.MedianECG.I XML.MedianECG.II]; %Sï¿½tter EKG i rigtig rï¿½kkefï¿½lge ift. transformering
+ecg = [XML.MedianECG.V1 XML.MedianECG.V2 XML.MedianECG.V3 XML.MedianECG.V4 XML.MedianECG.V5 XML.MedianECG.V6 XML.MedianECG.I XML.MedianECG.II]; %Sætter EKG i rigtig rækkefølge ift. transformering
 III=XML.MedianECG.III;
 aVF=XML.MedianECG.aVF;
 
@@ -43,9 +43,9 @@ axis equal
 axl=200; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
-xlabel('x [ï¿½V]');
-ylabel('y [ï¿½V]');
-zlabel('z [ï¿½V]');
+xlabel('x [µV]');
+ylabel('y [µV]');
+zlabel('z [µV]');
 title('3D plot of P-loop');
 hold on
 
@@ -86,7 +86,7 @@ fsurf(Z,'FaceColor','y','EdgeColor','none','facealpha',0.2)
 
 P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
 
-%Beregn elektrodepunkter fra origo til punkter pï¿½ planet 
+%Beregn elektrodepunkter fra origo til punkter på planet 
 P(1,:)=P1;
 for i=1:35  
     theta(i) = 10*i*pi/180;
@@ -94,7 +94,7 @@ for i=1:35
 end
 
 %% Beregner pseudoleads ift PCA(0,0,0)
-pcaorig=sum(P,1)/length(P); %bestemmer punkt pï¿½ plan som er vinkelret til origo
+pcaorig=sum(P,1)/length(P); %bestemmer punkt på plan som er vinkelret til origo
 
 plot3([0 pcaorig(1)],[0 pcaorig(2)],[0 pcaorig(3)]); %plotter normalvektor til plan som rammer origo 
 
@@ -143,15 +143,15 @@ hold on
 
 
 figure()
-for j=1:length(inf_p_leads) %ser kun pï¿½ 180 grader. Gennemlï¿½ber 180 graders leads
+for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
     lead=inf_p_leads(j,:)'; 
-    for i=1:length(VCG_T_pca) %gennemlï¿½ber length(VCG_T_pca) antal datapunkter
+    for i=1:length(VCG_T_pca) %gennemløber length(VCG_T_pca) antal datapunkter
         pointvec=VCG_T_pca(:,i); %vektoren som skal projekteres er det PC-plans-korrigerede punkt. 
-        projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec pï¿½ valgte lead.
-        leadprojvec(j,i,:)=projvec(i,:); %gemmer den beregnede projekterede vektor (i) i den tilhï¿½rende lead (j) 
+        projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
+        leadprojvec(j,i,:)=projvec(i,:); %gemmer den beregnede projekterede vektor (i) i den tilhørende lead (j) 
         
-        if dot(projvec(i,:),lead)<0 %Sï¿½rger for at gï¿½re modsatrettet projection negativ vha. dot-product
-            projlength(i)=-sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-lï¿½ngder. Negativ pga modsatrettet. 
+        if dot(projvec(i,:),lead)<0 %Sørger for at gøre modsatrettet projection negativ vha. dot-product
+            projlength(i)=-sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); %beregning af projektionsvektor-længder. Negativ pga modsatrettet. 
             leadprojlength(j,i)=projlength(i);
         else
             projlength(i)=sqrt(projvec(i,1)^2+projvec(i,2)^2+projvec(i,3)^2); 
@@ -162,10 +162,10 @@ for j=1:length(inf_p_leads) %ser kun pï¿½ 180 grader. Gennemlï¿½ber 180 graders 
     plot(time,leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
     axis square 
     xlabel('Time [ms]')
-    ylabel('Amplitude [ï¿½V]')
+    ylabel('Amplitude [µV]')
 end
 title('Projections on the pseudoleads')
-legend('0ï¿½','10ï¿½','20ï¿½','30ï¿½','40ï¿½','50ï¿½','60ï¿½','70ï¿½','80ï¿½','90ï¿½','100ï¿½','110ï¿½','120ï¿½','130ï¿½','140ï¿½','150ï¿½','160ï¿½','170ï¿½');
+legend('0°','10°','20°','30°','40°','50°','60°','70°','80°','90°','100°','110°','120°','130°','140°','150°','160°','170°');
 
 subplot(2,1,2) %konventionelle leads til sammenligning
 plot(ecg(On:Off,8));hold on;
@@ -175,7 +175,7 @@ title('Konventionelle leads')
 legend('II','III','aVF');
 axis square
     xlabel('Time [ms]')
-    ylabel('Amplitude [ï¿½V]')
+    ylabel('Amplitude [µV]')
 
 
 
