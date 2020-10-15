@@ -48,21 +48,22 @@ for i=1:36
 end
 
 %% Projection 
-numerationOfElectrodes = zeros(1,18);
-for i=1:10
-    numerationOfElectrodes(i) = 37-i;
-    inf_p_leads1(i,:) = P_pca(i,:);
-end
-for j=29:36
-    i = i+1;
-    numerationOfElectrodes(i) = 37-j;
-    inf_p_leads2(j,:) = P_pca(j,:);
-end
+% numerationOfElectrodes = zeros(1,18);
+% for i=1:10
+%     numerationOfElectrodes(i) = 37-i;
+%     inf_p_leads1(i,:) = P_pca(i,:);
+% end
+% for j=29:36
+%     i = i+1;
+%     numerationOfElectrodes(i) = 37-j;
+%     inf_p_leads2(j,:) = P_pca(j,:);
+% end
+% 
+% inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];
+numerationOfElectrodes = 0:35;
 
-inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];
-
-for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
-    lead=inf_p_leads(j,:)'; 
+for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
+    lead=P_pca(j,:)'; 
     for i=1:length(VCG_T_pca) %gennemløber length(VCG_T_pca) antal datapunkter
         pointvec=VCG_T_pca(:,i); %vektoren som skal projekteres er det PC-plans-korrigerede punkt. 
         projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
@@ -78,4 +79,15 @@ for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders lead
     end
    
 end
+
+selectedLeadsAndElectrodes = [1:10,29:36]; %Look at the span from 0-90 degrees and from 280 to 350 degrees
+
+leadprojlength = leadprojlength(selectedLeadsAndElectrodes,:);
+Pseudo_electrodes = Pseudo_electrodes(selectedLeadsAndElectrodes,:);
+numerationOfElectrodes = numerationOfElectrodes(selectedLeadsAndElectrodes);
+
+
+end
+
+
 
