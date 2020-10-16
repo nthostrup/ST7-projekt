@@ -25,9 +25,12 @@ planeeq=dot(U(:,3),[x,y,z]-VCGavg');
 Z=solve(planeeq==0,z);
 
 %% Electrodeplacering ift origo 
+c = 5; %Shifting factor to extend electrode placements.
+PCA_origin=((dot(VCGavg,U(:,3)'))/(sqrt(U(1,3)^2+U(2,3)^2+U(3,3)^2)^2))*U(:,3);
+%P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
 
-P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
-
+P1=[PCA_origin(1)+U(1,1)*S(1,1) PCA_origin(2)+U(2,1)*S(1,1) PCA_origin(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
+P1 = P1 .* c;
 %Beregn elektrodepunkter fra origo til punkter på planet 
 Pseudo_electrodes(1,:)=P1;
 for i=1:35  
