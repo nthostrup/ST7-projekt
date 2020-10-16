@@ -124,25 +124,11 @@ end
 
 %% Projection 
 
-for i=1:10
-inf_p_leads1(i,:) = P_pca(i,:);
-end
-for i=29:36
-inf_p_leads2(i,:) = P_pca(i,:);
-end
-
-inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];     % 1 =vektor til PC1
-for i=1:18
- plot3([0 inf_p_leads(i,1)],[0 inf_p_leads(i,2)], [0 inf_p_leads(i,3)],'y') %plotter pseudoleads i PC1-2-plan 
-end
-hold on
- text(P(1,1),P(1,2),P(1,3),'P(0)');
-
 
 
 figure()
-for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
-    lead=inf_p_leads(j,:)'; 
+for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
+    lead=P_pca(j,:)'; 
     for i=1:length(VCG_T_pca) %gennemløber length(VCG_T_pca) antal datapunkter
         pointvec=VCG_T_pca(:,i); %vektoren som skal projekteres er det PC-plans-korrigerede punkt. 
         projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
