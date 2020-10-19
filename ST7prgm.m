@@ -8,11 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-<<<<<<< Updated upstream
-XML = XMLECGParser(xmlfiles(13).name);  
-=======
 XML = XMLECGParser(xmlfiles(17).name);  
->>>>>>> Stashed changes
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
