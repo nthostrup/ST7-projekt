@@ -61,7 +61,11 @@ sum_p_inv_loop(nr) = 0;                         % integrallet af den negative P
        sum_p_inv_loop(nr) = sum_p_inv_loop(nr) + sum_p_midl;
     end
   end
-% Enheden for sum_p_loop og sum_p_inv_loop er mikroVolt*ms.
+    
+% Enheden for sum_p_loop og sum_p_inv_loop er mikroVolt*ms. sum_p_inv_loop
+% kan være positiv, da udregning regner integralet mellem to punkter af
+% gangen. Hvis punkterne er på hver side af 0, vil dette påvirke
+% resultatet.
 
 % Detection af bifasisk p-bølge
 biphasic_p_wave(nr) = 0;                    % Initialiseres og sættes til 0.
