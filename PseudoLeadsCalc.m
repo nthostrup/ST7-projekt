@@ -13,6 +13,11 @@ B = VCG_T - VCGavg*ones(1,nPoints);   % Mean-subtracted Data
 % U describes the rotation of the points and S describes the varians
 % (the principal components)
 
+%% Check the direction of PC1. Invert if the direction is superior
+if U(3,1)>0
+    U(:,1) = U(:,1)*(-1);
+end
+
 %Define principal component (point)
 PC1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %PC1
 PC2=[VCGavg(1)+U(1,2)*S(2,2) VCGavg(2)+U(2,2)*S(2,2) VCGavg(3)+U(3,2)*S(2,2)]; %PC2
