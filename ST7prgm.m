@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(14).name);  
+XML = XMLECGParser(xmlfiles(17).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -63,7 +63,13 @@ B = VCG_T - VCGavg*ones(1,nPoints);   % Mean-subtracted Data
 % U describes the rotation of the points and S describes the varians
 % (the principal components)
 
-%Define principal component (point)
+%% Check the direction of PC1. Invert if the direction is superior
+if U(3,1)>0
+    U(:,1) = U(:,1)*(-1);
+end
+
+
+% %Define principal component (point)
 PC1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %PC1
 PC2=[VCGavg(1)+U(1,2)*S(2,2) VCGavg(2)+U(2,2)*S(2,2) VCGavg(3)+U(3,2)*S(2,2)]; %PC2
 PC3=[VCGavg(1)+U(1,3)*S(3,3) VCGavg(2)+U(2,3)*S(3,3) VCGavg(3)+U(3,3)*S(3,3)]; %PC3
@@ -72,6 +78,7 @@ PC3=[VCGavg(1)+U(1,3)*S(3,3) VCGavg(2)+U(2,3)*S(3,3) VCGavg(3)+U(3,3)*S(3,3)]; %
  plot3([VCGavg(1) PC1(1)],[VCGavg(2) PC1(2)],[VCGavg(3) PC1(3)], 'b-')
  plot3([VCGavg(1) PC2(1)],[VCGavg(2) PC2(2)],[VCGavg(3) PC2(3)], 'g-')
  plot3([VCGavg(1) PC3(1)],[VCGavg(2) PC3(2)],[VCGavg(3) PC3(3)], 'c-')
+ 
  
 %% Create plane 
 % Normalvektoren til planet er vores 3. principalkomponents retning (U). 
@@ -105,7 +112,6 @@ for i=1:36
    plot3([PCA_origin(1) P(i,1)],[PCA_origin(2) P(i,2)], [PCA_origin(3) P(i,3)],'b') 
 end
 
-
 %% Plot data med PCA-origo 
 VCG_T_pca=VCG_T-PCA_origin;
 
@@ -120,10 +126,10 @@ end
 for i=1:36
    plot3([0 P_pca(i,1)],[0 P_pca(i,2)], [0 P_pca(i,3)],'c') %plotter pseudoleads i PC1-2-plan 
 end
+%view([10 -100 10])
 
 
 %% Projection 
-
 
 
 figure()
@@ -144,7 +150,6 @@ for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
     end
     subplot(2,1,1)
     plot(time,leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
-axis([274 396 -35 200])
       axis square 
     xlabel('Time [ms]')
     ylabel('Amplitude [µV]')

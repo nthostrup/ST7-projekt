@@ -8,7 +8,7 @@ xmlfiles=dir(fullfile(datafiledir,'*xml'));
 %% Define dataset, transformation type and interval
 
 %Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
-XML = XMLECGParser(xmlfiles(14).name);  
+XML = XMLECGParser(xmlfiles(3).name);  
 
 % Define part of ECG
 On=XML.TestInfo.POnset;
@@ -40,7 +40,7 @@ figure()
 scatter3(VCG_T(:,1),VCG_T(:,2),VCG_T(:,3),'r','.') %VCG_T er allerede vendt korrekt ift. [x,z,-y]
 axis square
 axis equal
-axl=200; %axislength
+axl=150; %axislength
 axis([-axl axl -axl axl -axl axl]); 
 grid on
 xlabel('x [µV]');
@@ -63,7 +63,13 @@ B = VCG_T - VCGavg*ones(1,nPoints);   % Mean-subtracted Data
 % U describes the rotation of the points and S describes the varians
 % (the principal components)
 
-%Define principal component (point)
+%% Check the direction of PC1. Invert if the direction is superior
+if U(3,1)>0
+    U(:,1) = U
+end
+
+
+% %Define principal component (point)
 PC1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %PC1
 PC2=[VCGavg(1)+U(1,2)*S(2,2) VCGavg(2)+U(2,2)*S(2,2) VCGavg(3)+U(3,2)*S(2,2)]; %PC2
 PC3=[VCGavg(1)+U(1,3)*S(3,3) VCGavg(2)+U(2,3)*S(3,3) VCGavg(3)+U(3,3)*S(3,3)]; %PC3
@@ -73,6 +79,10 @@ PC3=[VCGavg(1)+U(1,3)*S(3,3) VCGavg(2)+U(2,3)*S(3,3) VCGavg(3)+U(3,3)*S(3,3)]; %
  plot3([VCGavg(1) PC2(1)],[VCGavg(2) PC2(2)],[VCGavg(3) PC2(3)], 'g-')
  plot3([VCGavg(1) PC3(1)],[VCGavg(2) PC3(2)],[VCGavg(3) PC3(3)], 'c-')
  
+%  plot3([VCGavg(1) PC1_1(1)],[VCGavg(2) PC1_1(2)],[VCGavg(3) PC1_1(3)], 'k-')
+%  plot3([VCGavg(1) PC2_1(1)],[VCGavg(2) PC2_1(2)],[VCGavg(3) PC2_1(3)], 'y-')
+%  plot3([VCGavg(1) PC3_1(1)],[VCGavg(2) PC3_1(2)],[VCGavg(3) PC3_1(3)], 'r-')
+%  
 %% Create plane 
 % Normalvektoren til planet er vores 3. principalkomponents retning (U). 
 syms x y z
@@ -86,9 +96,9 @@ PCA_origin=((dot(VCGavg,U(:,3)'))/(sqrt(U(1,3)^2+U(2,3)^2+U(3,3)^2)^2))*U(:,3);
 
 
 %% Electrodeplacering ift origo 
+%U = U*(-1);
+P1 = [PCA_origin(1)+U(1,1)*S(1,1) PCA_origin(2)+U(2,1)*S(1,1) PCA_origin(3)+U(3,1)*S(1,1)];
 
-P1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %lead som de andre leads tager udgangspunkt i 
-P1_1 = [PCA_origin(1)+U(1,1)*S(1,1) PCA_origin(2)+U(2,1)*S(1,1) PCA_origin(3)+U(3,1)*S(1,1)];
 
 %Beregn elektrodepunkter fra origo til punkter på planet 
 P(1,:)=P1;
@@ -97,32 +107,27 @@ for i=1:35
     P(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
 end
 
-P1_1(1,:)=P1_1;
-for i=1:35  
-    theta(i) = 10*i*pi/180;
-    P_1(i+1,:) = P1_1*cos(theta(i)) +cross(U(:,3),P1_1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1_1)*(1-cos(theta(i))); %Rodrigues formel 
-end
 
 %% Beregner pseudoleads ift PCA(0,0,0)
-pcaorig=sum(P,1)/length(P); %bestemmer punkt på plan som er vinkelret til origo
 
-plot3([0 pcaorig(1)],[0 pcaorig(2)],[0 pcaorig(3)]); %plotter normalvektor til plan som rammer origo 
-%plot3([PCA_origin(1) P1_1(1)],[PCA_origin(2) P1_1(2)],[PCA_origin(3) P1_1(3)])
+plot3([0 PCA_origin(1)],[0 PCA_origin(2)],[0 PCA_origin(3)]); %plotter normalvektor til plan som rammer origo 
 
 %Plot pseudoleads
 for i=1:36
-   plot3([pcaorig(1) P(i,1)],[pcaorig(2) P(i,2)], [pcaorig(3) P(i,3)],'g') 
+   plot3([PCA_origin(1) P(i,1)],[PCA_origin(2) P(i,2)], [PCA_origin(3) P(i,3)],'b') 
 end
+text(P(1,1), P(1,2), P(1,3),'P0')
+text(P(5,1), P(5,2), P(5,3),'P5')
 
 %% Plot data med PCA-origo 
-VCG_T_pca=VCG_T-pcaorig';
+VCG_T_pca=VCG_T-PCA_origin;
 
 scatter3(VCG_T_pca(1,:),VCG_T_pca(2,:),VCG_T_pca(3,:),'b','.')
 
 %% Electrodes ift. PCA(0,0,0)
 
 for i=1:36
-    P_pca(i,:)=P(i,:)-pcaorig;
+    P_pca(i,:)=P(i,:)-PCA_origin';
 end
 
 for i=1:36
@@ -132,31 +137,11 @@ end
 
 %% Projection 
 
-for i=1:10
-inf_p_leads1(i,:) = P_pca(i,:);
-end
-for i=29:36
-inf_p_leads2(i,:) = P_pca(i,:);
-end
-
-inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];     % 1 =vektor til PC1
-for i=1:18
- plot3([0 inf_p_leads(i,1)],[0 inf_p_leads(i,2)], [0 inf_p_leads(i,3)],'y') %plotter pseudoleads i PC1-2-plan 
-end
-hold on
-% text(inf_p_leads2(29,1),inf_p_leads2(29,2),inf_p_leads2(29,3),'inf-p-leads2(29)');
-% text(P(1,1),P(1,2),P(1,3),'P(1)');
-% text(P(2,1),P(2,2),P(2,3),'P(2)');
-% text(P(5,1),P(5,2),P(5,3),'P(5)');
-% text(P(30,1),P(30,2),P(30,3),'P(30)');
-% text(inf_p_leads(1,1),inf_p_leads(1,2),inf_p_leads(1,3),'inf-p-leads(1)');
-% text(inf_p_leads(5,1),inf_p_leads(10,2),inf_p_leads(10,3),'inf-p-leads(10)');
-
 
 
 figure()
-for j=1:length(inf_p_leads) %ser kun på 180 grader. Gennemløber 180 graders leads
-    lead=inf_p_leads(j,:)'; 
+for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
+    lead=P_pca(j,:)'; 
     for i=1:length(VCG_T_pca) %gennemløber length(VCG_T_pca) antal datapunkter
         pointvec=VCG_T_pca(:,i); %vektoren som skal projekteres er det PC-plans-korrigerede punkt. 
         projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
