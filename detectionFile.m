@@ -1,6 +1,6 @@
 % funktionen for detektion ved brug af fil med ECG (hvor kolonner er leads, og rækker er samples)  
 
-function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop] = detectionFile(ecg, POnset, POffset)   
+function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b] = detectionFile(ecg, POnset, POffset)   
 
 % p_iab kan være 0 eller 1 og indikere om subjekt har partiel IAB. 
 % biphasic_p_wave er en 1*M vektor og angiver om p-bølgen er bifasisk i henholdvis ecg(:,1), ecg(:,2) osv....
