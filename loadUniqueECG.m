@@ -16,7 +16,7 @@ end
 
 uniqueIDs = unique(personIDArray,'rows');
 
-uniqueECGs = struct('ID','','ECGs',0,'dateTimeAcq','','fileName','');
+uniqueECGs = struct('ID','','ECGs',0,'dateTimeAcq','','fileName','','POn',0,'POff',0);
 for j=1:size(uniqueIDs,1)
     ID = uniqueIDs(j,:);
     uniqueECGs(j).ID=ID;
@@ -26,6 +26,8 @@ for j=1:size(uniqueIDs,1)
             uniqueECGs(j).ECGs(k,1:600,1:12) = XML(i).MedianECG.ECG12Leads;
             uniqueECGs(j).dateTimeAcq(k,:) = XML(i).TestInfo.AcqDateTime;
             uniqueECGs(j).fileName(k,:) = XML(i).TestInfo.Filename;
+            uniqueECGs(j).POn(k) = XML(i).TestInfo.POnset;
+            uniqueECGs(j).POff(k) = XML(i).TestInfo.POffset;
             k = k+1;
         end
     end
