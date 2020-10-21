@@ -42,7 +42,7 @@ axis square
 axis equal
 axl=200; %axislength
 axis([-axl axl -axl axl -axl axl]); 
-grid on
+grid off
 xlabel('x [µV]');
 ylabel('y [µV]');
 zlabel('z [µV]');
@@ -130,11 +130,20 @@ end
 
 
 %% Projection 
+% for i=1:9
+%     inflead1(i,:) = P_pca(i,:);
+% end
+% for i=27:35
+%     inflead2(i,:) = P_pca(i,:);
+% end
+% 
+% infleads = [inflead1(1:9,:);inflead2(27:35,:)];
+
 
 
 figure()
-for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
-    lead=P_pca(j,:)'; 
+for j=1:length(infleads) %ser kun på 180 grader. Gennemløber 180 graders leads
+    lead=infleads(j,:)'; 
     for i=1:length(VCG_T_pca) %gennemløber length(VCG_T_pca) antal datapunkter
         pointvec=VCG_T_pca(:,i); %vektoren som skal projekteres er det PC-plans-korrigerede punkt. 
         projvec(i,:)=((dot(pointvec,lead))/(sqrt(lead(1)^2+lead(2)^2+lead(3)^2)^2))*lead; %Projection af pointvec på valgte lead.
@@ -150,12 +159,13 @@ for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
     end
     subplot(2,1,1)
     plot(time,leadprojlength(j,:)); hold on;  %plotter j-lead-projectioner af alle datapunkter  
-      axis square 
+    axis square 
+    axis([250 382 -50 120])
     xlabel('Time [ms]')
     ylabel('Amplitude [µV]')
 end
 title('Projections on the pseudoleads')
-legend('0°','10°','20°','30°','40°','50°','60°','70°','80°','90°','100°','110°','120°','130°','140°','150°','160°','170°');
+legend('0°','10°','20°','30°','40°','50°','60°','70°','80°','90°','280°','290°','300°','310°','320°','330°','340°','350°');
 
 subplot(2,1,2) %konventionelle leads til sammenligning
 plot(ecg(On:Off,8));hold on;
