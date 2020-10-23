@@ -23,11 +23,11 @@ for j=1:size(uniqueIDs,1)
     k = 1;
     for i=1:length(XML)
         if(XML(i).TestInfo.PatientID == ID)
-            uniqueECGs(j).ECGs(k,1:600,1:12) = XML(i).MedianECG.ECG12Leads;
-            uniqueECGs(j).dateTimeAcq(k,:) = XML(i).TestInfo.AcqDateTime;
-            uniqueECGs(j).fileName(k,:) = XML(i).TestInfo.Filename;
-            uniqueECGs(j).POn(k) = XML(i).TestInfo.POnset;
-            uniqueECGs(j).POff(k) = XML(i).TestInfo.POffset;
+            uniqueECGs(j).ECGs(k,1:600,1:12) = XML(i).MedianECG.ECG12Leads; %All 12 lead ecgs.
+            uniqueECGs(j).dateTimeAcq(k,:) = XML(i).TestInfo.AcqDateTime; %Date of aquisition of ekg
+            uniqueECGs(j).fileName(k,:) = XML(i).TestInfo.Filename; %filename on the file used
+            uniqueECGs(j).POn(k) = XML(i).TestInfo.POnset; %p-onset
+            uniqueECGs(j).POff(k) = XML(i).TestInfo.POffset; %p-offset
             k = k+1;
         end
     end
