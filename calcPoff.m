@@ -45,7 +45,7 @@ while POffWrong==1
             end
             if alignedSignal(j)< 0                  % Her summeres den negative del af p-loopet
                 %    sum_p_inv_loop(nr) = sum_p_inv_loop(nr) + 10^6*(P_ecg_aligned(i))/(XML.TestInfo.ECGSampleBase * 1000);    % den gamle metode
-                sum_inv(i) = sum_inv(i) + (trapz(alignedSignal(j-1:j))/500)*1000;
+                sum_inv(i) = sum_inv(i) + (-trapz(alignedSignal(j-1:j))/500)*1000;
                 
                 if sum_inv(i)>160
                     POffWrong=1;
