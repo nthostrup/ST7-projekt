@@ -1,4 +1,4 @@
-function [uniqueECGs] = loadUniqueECG(directorypath)
+function [uniqueECGs] = loadUniqueECG_from_folder(directorypath)
 %loadUniqueECG Summary of this function goes here
 %  Inputs:
 %   dir: Directory of data to load
