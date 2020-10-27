@@ -1,4 +1,4 @@
-function [leadprojlength, Pseudo_electrodes, numerationOfElectrodes] = PseudoLeadsCalc(VCG_in)
+function [leadprojlength, Pseudo_electrodes, numerationOfElectrodes,PC12_ratio] = PseudoLeadsCalc(VCG_in)
 
 %Arrange axis correct as by convention
 VCG_T=[VCG_in(:,1) VCG_in(:,3) -VCG_in(:,2)];
@@ -22,6 +22,10 @@ end
 PC1=[VCGavg(1)+U(1,1)*S(1,1) VCGavg(2)+U(2,1)*S(1,1) VCGavg(3)+U(3,1)*S(1,1)]; %PC1
 PC2=[VCGavg(1)+U(1,2)*S(2,2) VCGavg(2)+U(2,2)*S(2,2) VCGavg(3)+U(3,2)*S(2,2)]; %PC2
 PC3=[VCGavg(1)+U(1,3)*S(3,3) VCGavg(2)+U(2,3)*S(3,3) VCGavg(3)+U(3,3)*S(3,3)]; %PC3
+
+PC1_from_origin=[U(1,1)*S(1,1) U(2,1)*S(1,1) U(3,1)*S(1,1)];
+PC2_from_origin=[U(1,2)*S(2,2) U(2,2)*S(2,2) U(3,2)*S(2,2)]; 
+PC12_ratio=(norm(PC2_from_origin))/(norm(PC1_from_origin)); 
 
 %% Create plane 
 % Normalvektoren til planet er vores 3. principalkomponents retning (U). 
