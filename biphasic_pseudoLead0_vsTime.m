@@ -4,8 +4,8 @@
 %sorting of leads in ecg12: I, II, III, aVR, aVL, aVF, V1, V2, V3, V4, V5, V6
 close all
 clear;
-directorypath = 'S:\Testdata\';
-uniqueECGS = loadUniqueECG(directorypath);
+directorypath = 'S:\IAB-data\pIAB-p7\';
+uniqueECGS = loadUniqueECG_from_folder(directorypath);
 %%
 %Kors matrix:
 T=[0.3800   -0.0700   -0.1300    0.0500   -0.0100    0.1400    0.0600    0.5400;
