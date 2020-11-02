@@ -1,6 +1,6 @@
 % funktionen for detektion ved brug af fil med ECG (hvor kolonner er leads, og rækker er samples)  
 
-function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b] = detectionFile(ecg, POnset, POffset)   
+function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b, p_prime_ampl] = detectionFile(ecg, POnset, POffset)   
 
 % p_iab kan være 0 eller 1 og indikere om subjekt har partiel IAB. 
 % biphasic_p_wave er en 1*M vektor og angiver om p-bølgen er bifasisk i henholdvis ecg(:,1), ecg(:,2) osv....
@@ -10,6 +10,14 @@ function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b] = detectionFi
 P=[POnset POffset];       % Vektor med P_onset og P_Offset
 
 [r,c] = size(ecg);
+
+%Preallocation of variables for speed:
+a = zeros(1,c);
+b = zeros(1,c);
+sum_p_loop = zeros(1,c);
+sum_p_inv_loop = zeros(1,c);
+biphasic_p_wave = zeros(1,c);
+p_prime_ampl = zeros(1,c);
 
 % Her køres et loop for hver lead. eks. Hvis nr = 1, analyseres lead II (da ecg(;,1) er lead II).  
 for nr=1:1:c                            % c er antallet af leads (kolonner) 
@@ -30,17 +38,8 @@ for i=1:1:length(P_loop)
    P_ecg_aligned(i)= P_ecg_aligned(i)-(a(nr)*(P(1,1)+i-1)+b(nr)); %her fratrækkes regressionen for alle punkter i p-loopet.   
 end
 
-%kan plottes med følgende udkommenterede: (figur 1 er lead II, figur 2 er lead aVF, figur 3 er lead III)
-%figure(nr), subplot(2,1,1)          
-% plot(P_loop)
-% hold on 
-% t=[1:length(P_loop)];
-% x= [P(1,1):P(1,2)];
-% plot(t,a(nr)*x+b(nr))
-% legend('oprindelige p-loop')
-% subplot(2,1,2)
-% plot(P_ecg_aligned)
-% legend('modificeret p-loop uden hældning') %note: p_onset og p_offset er nu det samme efter fratrækning af regressionen. 
+%Finding the amplitude of p_prime
+p_prime_ampl(nr)=min(P_ecg_aligned);
 
 % beregning af integralet af p-loopet
 sum_p_loop(nr) = 0;                             % Integralet af P
