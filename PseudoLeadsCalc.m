@@ -41,6 +41,7 @@ PCA_origin=((dot(VCGavg,U(:,3)'))/(sqrt(U(1,3)^2+U(2,3)^2+U(3,3)^2)^2))*U(:,3); 
 P1=[PCA_origin(1) + U(1,1)*S(1,1)*c PCA_origin(2) + U(2,1)*S(1,1)*c PCA_origin(3) + U(3,1)*S(1,1)*c]; %lead som de andre leads tager udgangspunkt i. Multiply by C to shift electrodes outwards to see them better
 %Beregn elektrodepunkter fra origo til punkter på planet 
 Pseudo_electrodes(1,:)=P1;
+theta = zeros(1,35); %Preallocation
 for i=1:35  
     theta(i) = 10*i*pi/180;
     Pseudo_electrodes(i+1,:) = P1*cos(theta(i)) +cross(U(:,3),P1)*sin(theta(i))+ U(:,3)'*dot(U(:,3),P1)*(1-cos(theta(i))); %Rodrigues formel 
@@ -71,6 +72,12 @@ end
 % end
 % 
 % inf_p_leads = [inf_p_leads1(1:10,:);inf_p_leads2(29:36,:)];
+%Preallocation:
+    projvec = zeros(length(VCG_T_pca),3);
+    leadprojvec = zeros(length(P_pca),length(VCG_T_pca),3);
+    projlength = zeros(1,length(VCG_T_pca));
+    leadprojlength = zeros(length(P_pca),length(VCG_T_pca));
+
 numerationOfElectrodes = 0:35;
 
 for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
