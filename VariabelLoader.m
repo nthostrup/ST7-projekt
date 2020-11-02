@@ -6,7 +6,7 @@
 %load() %% insert file
 
     % beregn nu p-off
-XML = AF_last_normal_ECG_XML_loaded; 
+XML = No_AF_ever_XML_loaded; 
 disp('starter')
 %Removing NaN entries:
 count = 0;
@@ -34,15 +34,15 @@ for i=1:length(XML)
 
     % Define part of ECG
     On(i)=XML(i).TestInfo.POnset;
-    GEOff=XML(i).TestInfo.POffset;
-    Qon=XML(i).TestInfo.QOnset;
+    Off(i)=XML(i).TestInfo.POffset;
+    %Qon=XML(i).TestInfo.QOnset;
 
-    Off(i)=calcPoff(infECG,GEOff,Qon);
+    %Off(i)=calcPoff(infECG,GEOff,Qon);
     
 end
 disp('p_offset er beregnet')
     % transformaer til VCG 
-
+%% 
 %Kors regression
 T=[-0.130 0.050 -0.010 0.140 0.060 0.540 0.380 -0.07;
      0.060 -0.020 -0.050 0.060 -0.170 0.130 -0.07 0.930;
