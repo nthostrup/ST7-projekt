@@ -19,7 +19,7 @@
 % 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> areal>10, interval 5, til 200 
 
 %%
-nrPopulation=1;
+nrPopulation=2;
 % antal subjekter i alt
 resultater(1,nrPopulation)=length(a);
 
@@ -50,9 +50,11 @@ for gradspaend = 10:10:80
     % Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
     % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
     % andOrModifier: modtager 0 = OR og 1 = AND
-    if detectionOutput_or(i)==1 && p_iab(i)==1
-        var(i)=1;
-    end
+    for i=1:1:length(a)
+        if detectionOutput_or(i)==1 && p_iab(i)==1
+            var(i)=1;
+        end
+    end 
     resultater(3+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 4-11
 end
 
@@ -67,8 +69,10 @@ for gradspaend = 10:10:80
     % Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
     % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
     % andOrModifier: modtager 0 = OR og 1 = AND
-    if detectionOutput_and(i)==1 && p_iab(i)==1              % husk at lave variablen om til AND
-        var(i)=1;
+    for i=1:1:length(a)
+        if detectionOutput_and(i)==1 && p_iab(i)==1              % husk at lave variablen om til AND
+            var(i)=1;
+        end
     end
     resultater(11+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 12-19
 end
