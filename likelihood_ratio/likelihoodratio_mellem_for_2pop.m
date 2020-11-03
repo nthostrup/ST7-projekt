@@ -24,6 +24,7 @@ test_nr=1;
 % antal subjekter i alt
 resultater(test_nr,nrPopulation)=length(a);
 test_nr=test_nr+1;
+opdeling(1)=test_nr;
 
 var= zeros(length(a),1);
 for i=1:1:length(a)
@@ -33,6 +34,7 @@ end
 end
 resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater
 test_nr=test_nr+1;
+opdeling(2)=test_nr;
 
 % bif p_0 med areal>160
 var= zeros(length(a),1);
@@ -42,7 +44,8 @@ for i=1:1:length(a)
     end 
 end 
 resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater
-test_nr=test_nr+1; 
+test_nr=test_nr+1;
+opdeling(3)=test_nr;
 
 disp('3 første test er kørt')
 
@@ -61,6 +64,7 @@ for gradspaend = 10:10:80
     end 
     resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 4-11
     test_nr=test_nr+1;
+    opdeling(4)=test_nr;
 end
 
 disp('færdig med eller')
@@ -81,13 +85,14 @@ for gradspaend = 10:10:80
     end
     resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 12-19
     test_nr=test_nr+1;
+    opdeling(5)=test_nr;
 end
 
 disp('færdig med og')
 
 % Areal
 
-for threshold = 160:100:5160
+for threshold = 10:10:2000
     var= zeros(length(a),1);
     for i=1:1:length(a)
         [detectionOutput] = areaDetectionMethod(sum_p_inv_loop(i,1), sum_p_loop(i,1), threshold);
@@ -100,11 +105,12 @@ for threshold = 160:100:5160
     end 
     resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 20-50
     test_nr=test_nr+1;
+    opdeling(6)=test_nr;
 end 
 disp('færdig med areal')
 
 % amplitude
-for threshold = 10:5:200
+for threshold = 2:2:100
     var= zeros(length(a),1);
     for i=1:1:length(a)
         [detectionOutput] = amplitudeDetectionMethod(p_prime_ampl(i,1), threshold);
@@ -117,6 +123,7 @@ for threshold = 10:5:200
     end 
     resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 70-110
     test_nr=test_nr+1;
+    opdeling(7)=test_nr;
 end 
 
 disp('færdig ')
@@ -165,6 +172,61 @@ likelihood_data(test,10) = likelihood_data(test,6)/likelihood_data(test,8); % LR
 likelihood_data(test,11) = likelihood_data(test,9)/likelihood_data(test,10);    %DOR
 end
 
+
+%% plot med opdelinger (KONGE PLOTSNE!!)
+close all;
+sens = 0.15;
+spec = 0.9; 
+
+for l=2:1:7
+    spand = [opdeling(l-1):opdeling(l)-1]; 
+    figure(l), subplot(3,1,1);
+    stem(likelihood_data(spand,11))
+    for i=spand
+        if likelihood_data(i,5)>sens && likelihood_data(i,8)>spec
+            hold on
+            stem(i-opdeling(l-1)+1,likelihood_data(i,11),'r')
+        end
+    end
+    grid on
+    
+    switch l
+        case 2
+        title('DOR - Konv_method')
+
+        case 3 
+            title('DOR - Biphasic in P0')
+            
+        case 4 
+            title('DOR - Bifasisk +- (ELLER)')
+        
+        case 5 
+            title('DOR - Bifasisk +- (OG)')
+            
+        case 6 
+            title('DOR - Area for P-prime 0')
+            
+        case 7 
+            title('DOR - Amplitude for P-prime 0')
+    end
+    
+      subplot(3,1,2)
+      plot(likelihood_data(spand,5))
+      hold on 
+      plot(likelihood_data(spand,8))
+      legend('sensitivity','specificity')
+      grid on
+      
+      subplot(3,1,3)
+        scatter(likelihood_data(spand,7), likelihood_data(spand,5))
+        hold on 
+        plot([0 1], [0 1])
+        xlabel('1-specificity')
+        ylabel('sensitivity')
+        title('ROC')
+        grid on 
+end 
+
 %% plot
 figure;
 stem(likelihood_data(:,11))
@@ -187,39 +249,7 @@ figure;
 stem(likelihood_data(:,10))
 legend('LR-')
 
-%% threshold for sensitivitet og specificitet
-sens = 0.2;
-spec = 0.9; 
-sensOver02=(find(likelihood_data(:,5)>sens))
-specOver09=(find(likelihood_data(:,8)>spec));
-%%
-for i=1:1:length(likelihood_data)
-    if likelihood_data(i,5)>sens && likelihood_data(:,8)>spec
-        stem(likelihood_data(i,11))
-    end
-end
 
-%%
-figure;
-sens_spec_r=likelihood_data(:,5).*likelihood_data(:,8)
-stem(sens_spec_r)
-
-%% 
-scatter(likelihood_data([71:100],7), likelihood_data([71:70],5))
-hold on 
-plot([0 1], [0 1])
-xlabel('1-specificity')
-ylabel('sensitivity')
-
-% for areal er den bedste data=20 -> min 160 areal
-% for amplitude er det 71 - min amp=10 
-
-
-%%
-
-x= [likelihood_data()]
-
-stem
 
 
 
