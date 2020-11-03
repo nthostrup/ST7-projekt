@@ -20,8 +20,10 @@
 
 %%
 nrPopulation=2;
+test_nr=1;
 % antal subjekter i alt
-resultater(1,nrPopulation)=length(a);
+resultater(test_nr,nrPopulation)=length(a);
+test_nr=test_nr+1;
 
 var= zeros(length(a),1);
 for i=1:1:length(a)
@@ -29,7 +31,8 @@ if (konv_biphasic_p_wave(i,1) == 1) && (konv_biphasic_p_wave(i,2) == 1) && (konv
     var(i) = 1;
 end 
 end
-resultater(2,nrPopulation)=nnz(var);        % gem resulater
+resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater
+test_nr=test_nr+1;
 
 % bif p_0 med areal>160
 var= zeros(length(a),1);
@@ -38,7 +41,8 @@ for i=1:1:length(a)
         var(i) = 1; 
     end 
 end 
-resultater(3,nrPopulation)=nnz(var);        % gem resulater
+resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater
+test_nr=test_nr+1; 
 
 disp('3 første test er kørt')
 
@@ -55,7 +59,8 @@ for gradspaend = 10:10:80
             var(i)=1;
         end
     end 
-    resultater(3+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 4-11
+    resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 4-11
+    test_nr=test_nr+1;
 end
 
 disp('færdig med eller')
@@ -74,15 +79,15 @@ for gradspaend = 10:10:80
             var(i)=1;
         end
     end
-    resultater(11+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 12-19
+    resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 12-19
+    test_nr=test_nr+1;
 end
 
 disp('færdig med og')
 
 % Areal
-raekke = 0;
+
 for threshold = 160:100:5160
-    raekke = raekke + 1; 
     var= zeros(length(a),1);
     for i=1:1:length(a)
         [detectionOutput] = areaDetectionMethod(sum_p_inv_loop(i,1), sum_p_loop(i,1), threshold);
@@ -93,15 +98,13 @@ for threshold = 160:100:5160
             var(i)=1;
         end
     end 
-    resultater(19+raekke,nrPopulation)=nnz(var);        % gem resulater i række 20-50
-    disp(raekke)
+    resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 20-50
+    test_nr=test_nr+1;
 end 
 disp('færdig med areal')
 
 % amplitude
-raekke = 0;
 for threshold = 10:5:200
-    raekke = raekke + 1; 
     var= zeros(length(a),1);
     for i=1:1:length(a)
         [detectionOutput] = amplitudeDetectionMethod(p_prime_ampl(i,1), threshold);
@@ -112,7 +115,8 @@ for threshold = 10:5:200
             var(i)=1;
         end
     end 
-    resultater(70+raekke,nrPopulation)=nnz(var);        % gem resulater i række 70-110
+    resultater(test_nr,nrPopulation)=nnz(var);        % gem resulater i række 70-110
+    test_nr=test_nr+1;
 end 
 
 disp('færdig ')
