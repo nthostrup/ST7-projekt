@@ -34,7 +34,7 @@ resultater(2,nrPopulation)=nnz(var);        % gem resulater
 % bif p_0 med areal>160
 var= zeros(length(a),1);
 for i=1:1:length(a)
-    if biphasic_p_wave(i,1) ==1 && p_iab(i)==1
+    if biphasic_p_wave(i,1) ==1 %&& p_iab(i)==1
         var(i) = 1; 
     end 
 end 
@@ -51,7 +51,7 @@ for gradspaend = 10:10:80
     % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
     % andOrModifier: modtager 0 = OR og 1 = AND
     for i=1:1:length(a)
-        if detectionOutput_or(i)==1 && p_iab(i)==1
+        if detectionOutput_or(i)==1% && p_iab(i)==1
             var(i)=1;
         end
     end 
@@ -70,7 +70,7 @@ for gradspaend = 10:10:80
     % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
     % andOrModifier: modtager 0 = OR og 1 = AND
     for i=1:1:length(a)
-        if detectionOutput_and(i)==1 && p_iab(i)==1              % husk at lave variablen om til AND
+        if detectionOutput_and(i)==1% && p_iab(i)==1              % husk at lave variablen om til AND
             var(i)=1;
         end
     end
@@ -89,7 +89,7 @@ for threshold = 160:100:5160
         % % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
         % Sum_p_inv_loop: Array med værdi for areal for P’ kurve for P0.
         % Threshold: grænseværdi for det minimumsareal for detektion. (min 0, max 10000
-        if detectionOutput==1 && p_iab(i)==1
+        if detectionOutput==1% && p_iab(i)==1
             var(i)=1;
         end
     end 
@@ -108,7 +108,7 @@ for threshold = 10:5:200
         % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
         % PprimeAmp: Array med amplitude målt i de 18 pseudo leads.
         % Threshold: threshold for amplituden, skal være positiv
-        if detectionOutput==1 && p_iab(i)==1
+        if detectionOutput==1% && p_iab(i)==1
             var(i)=1;
         end
     end 
@@ -128,7 +128,7 @@ disp(resultater)
 % 4-11 antal bifasiske +- x ift. 0. (ELLER) række 4 = +- 10, række 5= +-20 osv 
 % 12-19 antal bifasiske +- x ift. 0. (OG) række 12 = +- 10, række 13= +-20 osv 
 % 20-70 antal EKG'er, hvor arealet er over threshold. række 20 -> areal> 160, interval 100, op til 5160. 
-% 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> areal>10, interval 5, til 200
+% 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> amplitude>10, interval 5, til 200
 
 nrPopulation = 1; % skal være 1.
 % rækkerne er test
@@ -152,31 +152,70 @@ likelihood_data(test,1) = resultater(test,nrPopulation);                        
 likelihood_data(test,2) = resultater(1,nrPopulation)-resultater(test,nrPopulation);  %FN
 likelihood_data(test,3) = resultater(test,nrPopulation+1);                            %FP
 likelihood_data(test,4) = resultater(1,nrPopulation+1)-resultater(test,nrPopulation+1);  %TN
-likelihood_data(test,5) = likelihood_data(test,1)/(likelihood_data(test,1)+likelihood_data(test,4)); % TPR (sensitivity)
+likelihood_data(test,5) = likelihood_data(test,1)/(likelihood_data(test,1)+likelihood_data(test,2)); % TPR (sensitivity)
 likelihood_data(test,6) = likelihood_data(test,2)/(likelihood_data(test,2)+likelihood_data(test,1)); % FNR
 likelihood_data(test,7) = likelihood_data(test,3)/(likelihood_data(test,3)+likelihood_data(test,4)); % FPR
 likelihood_data(test,8) = likelihood_data(test,4)/(likelihood_data(test,4)+likelihood_data(test,3)); % TNR (specificity)
 likelihood_data(test,9) = likelihood_data(test,5)/likelihood_data(test,7); % LR+
 likelihood_data(test,10) = likelihood_data(test,6)/likelihood_data(test,8); % LR-
 likelihood_data(test,11) = likelihood_data(test,9)/likelihood_data(test,10);    %DOR
-end 
+end
 
 %% plot
 figure;
-plot(likelihood_data(:,11))
+stem(likelihood_data(:,11))
 legend('DOR')
+sens = 0.15;
+spec = 0.9; 
+for i=1:1:length(likelihood_data)
+    if likelihood_data(i,5)>sens && likelihood_data(i,8)>spec
+        hold on
+        stem(i,likelihood_data(i,11),'r')
+    end
+end
+
 
 figure;
-plot(likelihood_data(:,9))
+stem(likelihood_data(:,9))
 legend('LR+')
 
 figure;
-plot(likelihood_data(:,10))
+stem(likelihood_data(:,10))
 legend('LR-')
 
-%% 
-for i=1:1:length(a)
-    if sum_p_inv_loop(i,1)==-160
-        disp(i)
+%% threshold for sensitivitet og specificitet
+sens = 0.2;
+spec = 0.9; 
+sensOver02=(find(likelihood_data(:,5)>sens))
+specOver09=(find(likelihood_data(:,8)>spec));
+%%
+for i=1:1:length(likelihood_data)
+    if likelihood_data(i,5)>sens && likelihood_data(:,8)>spec
+        stem(likelihood_data(i,11))
     end
-end 
+end
+
+%%
+figure;
+sens_spec_r=likelihood_data(:,5).*likelihood_data(:,8)
+stem(sens_spec_r)
+
+%% 
+scatter(likelihood_data([71:100],7), likelihood_data([71:70],5))
+hold on 
+plot([0 1], [0 1])
+xlabel('1-specificity')
+ylabel('sensitivity')
+
+% for areal er den bedste data=20 -> min 160 areal
+% for amplitude er det 71 - min amp=10 
+
+
+%%
+
+x= [likelihood_data()]
+
+stem
+
+
+
