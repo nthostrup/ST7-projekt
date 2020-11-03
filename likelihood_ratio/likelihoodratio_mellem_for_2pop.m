@@ -19,7 +19,7 @@
 % 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> areal>10, interval 5, til 200 
 
 %%
-nrPopulation=2;
+nrPopulation=1;
 % antal subjekter i alt
 resultater(1,nrPopulation)=length(a);
 
@@ -45,18 +45,15 @@ disp('3 første test er kørt')
 % 4-11 antal bifasiske +- x ift. 0. række 4 = +- 10, række 5= +-20 osv
 for gradspaend = 10:10:80
     var= zeros(length(a),1);
-for i=1:1:length(a) 
-[detectionOutput_or] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 0);
-% detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
-% Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
-% DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
-% andOrModifier: modtager 0 = OR og 1 = AND
-if detectionOutput_or(i)==1 && p_iab(i)==1
-    var(i)=1;
-end
-end
-resultater(3+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 4-11
-disp(gradspaend)
+    [detectionOutput_or] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 0);
+    % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
+    % Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
+    % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
+    % andOrModifier: modtager 0 = OR og 1 = AND
+    if detectionOutput_or(i)==1 && p_iab(i)==1
+        var(i)=1;
+    end
+    resultater(3+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 4-11
 end
 
 disp('færdig med eller')
@@ -65,18 +62,15 @@ disp('færdig med eller')
 
 for gradspaend = 10:10:80
     var= zeros(length(a),1);
-for i=1:1:length(a) 
-[detectionOutput_and] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 1);
-% detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
-% Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
-% DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
-% andOrModifier: modtager 0 = OR og 1 = AND
-if detectionOutput_and(i)==1 && p_iab(i)==1              % husk at lave variablen om til AND
-    var(i)=1;
-end
-end
-resultater(11+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 12-19
-disp(gradspaend)
+    [detectionOutput_and] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 1);
+    % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
+    % Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
+    % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
+    % andOrModifier: modtager 0 = OR og 1 = AND
+    if detectionOutput_and(i)==1 && p_iab(i)==1              % husk at lave variablen om til AND
+        var(i)=1;
+    end
+    resultater(11+gradspaend/10,nrPopulation)=nnz(var);        % gem resulater i række 12-19
 end
 
 disp('færdig med og')
@@ -86,17 +80,17 @@ raekke = 0;
 for threshold = 160:100:5160
     raekke = raekke + 1; 
     var= zeros(length(a),1);
-for i=1:1:length(a)
-[detectionOutput] = areaDetectionMethod(sum_p_inv_loop(i,1), threshold);
-% % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
-% Sum_p_inv_loop: Array med værdi for areal for P’ kurve for P0.
-% Threshold: grænseværdi for det minimumsareal for detektion. (min 0, max 10000
-if detectionOutput==1 && p_iab(i)==1
-    var(i)=1;
-end
-end 
-resultater(19+raekke,nrPopulation)=nnz(var);        % gem resulater i række 20-50
-disp(raekke)
+    for i=1:1:length(a)
+        [detectionOutput] = areaDetectionMethod(sum_p_inv_loop(i,1), sum_p_loop(i,1), threshold);
+        % % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
+        % Sum_p_inv_loop: Array med værdi for areal for P’ kurve for P0.
+        % Threshold: grænseværdi for det minimumsareal for detektion. (min 0, max 10000
+        if detectionOutput==1 && p_iab(i)==1
+            var(i)=1;
+        end
+    end 
+    resultater(19+raekke,nrPopulation)=nnz(var);        % gem resulater i række 20-50
+    disp(raekke)
 end 
 disp('færdig med areal')
 
@@ -105,16 +99,16 @@ raekke = 0;
 for threshold = 10:5:200
     raekke = raekke + 1; 
     var= zeros(length(a),1);
-for i=1:1:length(a)
-[detectionOutput] = amplitudeDetectionMethod(p_prime_ampl(i,1), threshold);
-% detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
-% PprimeAmp: Array med amplitude målt i de 18 pseudo leads.
-% Threshold: threshold for amplituden, skal være positiv
-if detectionOutput==1 && p_iab(i)==1
-    var(i)=1;
-end
-end 
-resultater(70+raekke,nrPopulation)=nnz(var);        % gem resulater i række 70-110
+    for i=1:1:length(a)
+        [detectionOutput] = amplitudeDetectionMethod(p_prime_ampl(i,1), threshold);
+        % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
+        % PprimeAmp: Array med amplitude målt i de 18 pseudo leads.
+        % Threshold: threshold for amplituden, skal være positiv
+        if detectionOutput==1 && p_iab(i)==1
+            var(i)=1;
+        end
+    end 
+    resultater(70+raekke,nrPopulation)=nnz(var);        % gem resulater i række 70-110
 end 
 
 disp('færdig ')
@@ -175,3 +169,10 @@ legend('LR+')
 figure;
 plot(likelihood_data(:,10))
 legend('LR-')
+
+%% 
+for i=1:1:length(a)
+    if sum_p_inv_loop(i,1)==-160
+        disp(i)
+    end
+end 
