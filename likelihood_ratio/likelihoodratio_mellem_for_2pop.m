@@ -15,7 +15,7 @@
 % 3. antal bifasiske P0 med areal >160 
 % 4-11 antal bifasiske +- x ift. 0. (ELLER) række 4 = +- 10, række 5= +-20 osv 
 % 12-19 antal bifasiske +- x ift. 0. (OG) række 12 = +- 10, række 13= +-20 osv 
-% 20-70 antal EKG'er, hvor arealet er over threshold. række 20 -> areal> 160, interval 100, op til 5160. 
+% 20-219 antal EKG'er, hvor arealet er over threshold. række 20 -> areal> 10, interval 10, op til 2000. 
 % 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> areal>10, interval 5, til 200 
 
 %%
@@ -50,7 +50,7 @@ opdeling(3)=test_nr;
 disp('3 første test er kørt')
 
 % 4-11 antal bifasiske +- x ift. 0. række 4 = +- 10, række 5= +-20 osv
-for gradspaend = 10:10:80
+for gradspaend = 0:10:80
     var= zeros(length(a),1);
     [detectionOutput_or] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 0);
     % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
@@ -71,7 +71,7 @@ disp('færdig med eller')
 %
 % 12-19 antal bifasiske +- x ift. 0. (OG) række 12 = +- 10, række 13= +-20 osv  
 
-for gradspaend = 10:10:80
+for gradspaend = 0:10:80
     var= zeros(length(a),1);
     [detectionOutput_and] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 1);
     % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
@@ -175,8 +175,8 @@ end
 
 %% plot med opdelinger (KONGE PLOTSNE!!)
 close all;
-sens = 0.15;
-spec = 0.9; 
+sens = 1;
+spec = 1; 
 
 for l=2:1:7
     spand = [opdeling(l-1):opdeling(l)-1]; 
@@ -227,6 +227,130 @@ for l=2:1:7
         grid on 
 end 
 
+
+%%
+%% plot med opdelinger - rigtige x-akser og y-akser
+close all;
+sens = 1;
+spec = 1; 
+
+
+for l=2:1:7
+    spand = [opdeling(l-1):opdeling(l)-1]; 
+    
+    switch l
+        case 2
+        x=1;
+        titlestr='Konv_method';
+        Xstr = 'Konv method';
+        x=[10 20 30 40 50 60 70 80];
+            txt = 'Threshold = xx'
+
+
+        x_title = 0.2;
+        case 3 
+        titlestr='Biphasic in P0';
+        Xstr = 'Biphasic in P0';
+        x=1;
+                x=[10 20 30 40 50 60 70 80];
+
+        x_title = 0.2;
+            txt = 'Threshold = xx'
+
+
+            
+        case 4 
+        titlestr='Biphasic p-wave in +- X degrees from P0 (OR)';
+        Xstr = '+- [Degrees]';
+        x=[10 20 30 40 50 60 70 80];
+
+        x_title = 0.2;
+        txt = 'Threshold = 60 degrees'
+
+        
+        case 5 
+            titlestr='Biphasic p-wave in +- X degrees from P0 (AND)';
+            Xstr = '+- [Degrees]';
+            x=[10 20 30 40 50 60 70 80];
+            x_title = 0.2;
+                txt = 'Threshold = 10 degrees'
+
+        case 6 
+            titlestr='Area for P-prime 0';
+            Xstr = 'Area [\muV*ms]';
+            x=10:10:2000;
+
+            x_title = 0.3;
+            txt = 'Threshold = 10 \mu V * ms'
+
+            
+        case 7 
+            titlestr='Amplitude for P-prime 0';
+            Xstr = 'Amplitude [\muV]';
+            x=2:2:100;
+
+            x_title = 0.3;
+            txt = 'Threshold = 0.2 \mu V'
+
+            
+
+    end
+    
+    figure(l), figure('Position', [100 100 800 400]);%, subplot(3,1,1);
+    %stem(x,likelihood_data(spand,11),'.')
+    %title(titlestr)
+    %xlabel(Xstr)
+    %grid on
+    %ylim([0 16])
+    %ylabel('DOR')
+    %figure('Position', [100 100 800 400]);
+
+      subplot(1,3,1)
+      plot(x,likelihood_data([spand],5))
+      hold on 
+      plot(x,likelihood_data([spand],8))
+      xlabel(Xstr)
+      legend('Sensitivity','Specificity')
+      grid on
+      ylabel('Value')
+      ylim([-0.1 1.1])
+      
+      subplot(1,3,[2,3])
+        scatter(likelihood_data(spand,7), likelihood_data(spand,5),'.','r')
+        hold on 
+        plot([0 1], [0 1],'color',[0,0,0])          %random chance
+        hold on 
+        plot([0.5 0], [0.5 1],'--','color','b');      %optimal line
+        xlabel('1-specificity')
+        ylabel('Sensitivity')
+        legend('ROC','Random chance', 'Sensitivity = specificity')
+        grid on 
+        axis equal
+        axis([0 1 0 1])
+        annotation('textbox', [x_title, 0.91, 0.1, 0.1], 'String', titlestr, 'EdgeColor', 'none','FontSize',16)
+        %annotation('text',0.7,0.2,'String','y = x ')
+        text(0.5,0.2,txt)
+        
+        %annotation('arrow',[0.5 1],[0.5 1])
+        %t = annotation('textbox');
+        %sz = t.Color;
+        %t.Color = [17 17 17];
+
+
+end 
+
+%%
+clc
+    for i=1:1:length(likelihood_data)
+        laengder(i)=norm([likelihood_data(i,7), 1-likelihood_data(i,5)]);
+    end
+    
+for l=2:1:7
+    spand = [opdeling(l-1):opdeling(l)-1]; 
+        [M,i]=min(laengder(spand(1):spand(end)));
+        spand(i)
+end 
+
 %% plot
 figure;
 stem(likelihood_data(:,11))
@@ -250,6 +374,11 @@ stem(likelihood_data(:,10))
 legend('LR-')
 
 
+%% 
+diff=0;
+for i=4:1:11
+   diff(i) = likelihood_data(i,5)-likelihood_data(i,8);
+end
 
-
+diff
 
