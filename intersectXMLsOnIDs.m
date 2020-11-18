@@ -26,7 +26,7 @@ intersectedData = struct('ID','','timeOfAF','','timeLastNormal','','IndexLastNor
 for i = 1:length(C)
     intersectedData(i).ID = C(i,:); %ID of patient
     intersectedData(i).timeOfAF(1,:) = XML1_AFdata(IAF(i)).TestInfo.AcqDateTime; %Date of AF;
-    intersectedData(i).timeLastNormal(1,:) = XML2_LastNormaldata(ILastNormal(i)).TestInfo.AcqDateTime; %Date of AF;
+    intersectedData(i).timeLastNormal(1,:) = XML2_LastNormaldata(ILastNormal(i)).TestInfo.AcqDateTime; %Date of Last normal ECG.
     intersectedData(i).IndexLastNormal = ILastNormal(i);
     intersectedData(i).duration = days(datetime(intersectedData(i).timeOfAF,'InputFormat','yyyy-MM-dd HH:mm:ss')-datetime(intersectedData(i).timeLastNormal,'InputFormat','yyyy-MM-dd HH:mm:ss'));
 end

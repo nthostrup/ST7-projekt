@@ -1,5 +1,5 @@
 function [detectionOutput] = areaDetectionMethod(sum_p_inv_loop, sum_p_loop, threshold)
-% % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
+% % detectionOutput er en variabel, som med 1 eller 0 indikerer om metoden har fundet den givne karakteristika.
 % Sum_p_inv_loop: Array med værdi for areal for P’ kurve for P0.
 % sum_p_loop: Array med værdi for arealet af positive kurve for P0.
 % Threshold: grænseværdi for det minimumsareal for detektion. (min 0, max 10000)
