@@ -13,7 +13,7 @@ M = 100;
 %% Konventionelle leads 3 bifasiske = A-IAB = 1
 
 for i=1:length(konv_biphasic_p_wave)
-    if konv_biphasic_p_wave(i,1) == 1 && konv_biphasic_p_wave(i,2) == 1 && konv_biphasic_p_wave(i,3) == 1
+    if konv_biphasic_p_wave(i,1) == 1 && konv_biphasic_p_wave(i,2) == 1 && konv_biphasic_p_wave(i,3) == 1 && konv_p_iab(i) == 1
     S(i) = 1;
     else
     S(i) = 0;
