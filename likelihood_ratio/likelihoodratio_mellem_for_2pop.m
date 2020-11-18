@@ -16,7 +16,7 @@
 % 4-11 antal bifasiske +- x ift. 0. (ELLER) række 4 = +- 10, række 5= +-20 osv 
 % 12-19 antal bifasiske +- x ift. 0. (OG) række 12 = +- 10, række 13= +-20 osv 
 % 20-219 antal EKG'er, hvor arealet er over threshold. række 20 -> areal> 10, interval 10, op til 2000. 
-% 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> areal>10, interval 5, til 200 
+% 220-269 antal EKG'er, hvor amplituden er over threshold. raekke 220 -> amplitude >2, interval 2, til 100 
 
 %%
 nrPopulation=2;
@@ -39,7 +39,7 @@ opdeling(2)=test_nr;
 % bif p_0 med areal>160
 var= zeros(length(a),1);
 for i=1:1:length(a)
-    if biphasic_p_wave(i,1) ==1 %&& p_iab(i)==1
+    if biphasic_p_wave(i,1) ==1 && p_iab(i)==1
         var(i) = 1; 
     end 
 end 
@@ -50,7 +50,7 @@ opdeling(3)=test_nr;
 disp('3 første test er kørt')
 
 % 4-11 antal bifasiske +- x ift. 0. række 4 = +- 10, række 5= +-20 osv
-for gradspaend = 0:10:80
+for gradspaend = 10:10:80           % her blev startværdien ændret fra 0 til 10
     var= zeros(length(a),1);
     [detectionOutput_or] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 0);
     % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
@@ -58,7 +58,7 @@ for gradspaend = 0:10:80
     % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
     % andOrModifier: modtager 0 = OR og 1 = AND
     for i=1:1:length(a)
-        if detectionOutput_or(i)==1% && p_iab(i)==1
+        if detectionOutput_or(i)==1 && p_iab(i)==1
             var(i)=1;
         end
     end 
@@ -71,7 +71,7 @@ disp('færdig med eller')
 %
 % 12-19 antal bifasiske +- x ift. 0. (OG) række 12 = +- 10, række 13= +-20 osv  
 
-for gradspaend = 0:10:80
+for gradspaend = 10:10:80
     var= zeros(length(a),1);
     [detectionOutput_and] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,  gradspaend, 1);
     % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
@@ -79,7 +79,7 @@ for gradspaend = 0:10:80
     % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
     % andOrModifier: modtager 0 = OR og 1 = AND
     for i=1:1:length(a)
-        if detectionOutput_and(i)==1% && p_iab(i)==1              % husk at lave variablen om til AND
+        if detectionOutput_and(i)==1 && p_iab(i)==1              % husk at lave variablen om til AND
             var(i)=1;
         end
     end
@@ -90,7 +90,7 @@ end
 
 disp('færdig med og')
 
-% Areal
+% Areal - fra linje 20-219
 
 for threshold = 10:10:2000
     var= zeros(length(a),1);
@@ -99,7 +99,7 @@ for threshold = 10:10:2000
         % % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
         % Sum_p_inv_loop: Array med værdi for areal for P’ kurve for P0.
         % Threshold: grænseværdi for det minimumsareal for detektion. (min 0, max 10000
-        if detectionOutput==1% && p_iab(i)==1
+        if detectionOutput==1 && p_iab(i)==1
             var(i)=1;
         end
     end 
@@ -117,7 +117,7 @@ for threshold = 2:2:100
         % detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
         % PprimeAmp: Array med amplitude målt i de 18 pseudo leads.
         % Threshold: threshold for amplituden, skal være positiv
-        if detectionOutput==1% && p_iab(i)==1
+        if detectionOutput==1 && p_iab(i)==1
             var(i)=1;
         end
     end 
@@ -132,14 +132,14 @@ disp(resultater)
 
 
 %% likelihood ratio
-%resultater: (kopieret)
+%rækker:
 % 1. antal subjekter
 % 2. antal konv_a-iab
 % 3. antal bifasiske P0 med areal >160 
 % 4-11 antal bifasiske +- x ift. 0. (ELLER) række 4 = +- 10, række 5= +-20 osv 
 % 12-19 antal bifasiske +- x ift. 0. (OG) række 12 = +- 10, række 13= +-20 osv 
-% 20-70 antal EKG'er, hvor arealet er over threshold. række 20 -> areal> 160, interval 100, op til 5160. 
-% 71-110 antal EKG'er, hvor amplituden er over threshold. raekke 71 -> amplitude>10, interval 5, til 200
+% 20-219 antal EKG'er, hvor arealet er over threshold. række 20 -> areal> 10, interval 10, op til 2000. 
+% 220-269 antal EKG'er, hvor amplituden er over threshold. raekke 220 -> amplitude >2, interval 2, til 100 
 
 nrPopulation = 1; % skal være 1.
 % rækkerne er test
@@ -233,7 +233,7 @@ end
 close all;
 sens = 1;
 spec = 1; 
-
+likelihood_data = likelihood_data_UDEN_dur_krav;
 
 for l=2:1:7
     spand = [opdeling(l-1):opdeling(l)-1]; 
@@ -265,7 +265,7 @@ for l=2:1:7
         x=[10 20 30 40 50 60 70 80];
 
         x_title = 0.2;
-        txt = 'Threshold = 60 degrees'
+        txt = '           - Threshold = 60 degrees \newline- Threshold (p-dur>120 ms) = 80 degrees';
 
         
         case 5 
@@ -273,7 +273,7 @@ for l=2:1:7
             Xstr = '+- [Degrees]';
             x=[10 20 30 40 50 60 70 80];
             x_title = 0.2;
-                txt = 'Threshold = 10 degrees'
+                txt = '           - Threshold = 10 degrees \newline- Threshold (p-dur>120 ms) = 10 degrees';
 
         case 6 
             titlestr='Area for P-prime 0';
@@ -281,7 +281,7 @@ for l=2:1:7
             x=10:10:2000;
 
             x_title = 0.3;
-            txt = 'Threshold = 10 \mu V * ms'
+            txt = '           - Threshold = 10 \mu V * ms \newline- Threshold (p-dur>120 ms) = 10 \mu V * ms';
 
             
         case 7 
@@ -290,7 +290,7 @@ for l=2:1:7
             x=2:2:100;
 
             x_title = 0.3;
-            txt = 'Threshold = 0.2 \mu V'
+            txt = '           - Threshold = 0.2 \mu V \newline- Threshold (p-dur>120 ms) = 0.2 \mu V'
 
             
 
@@ -304,23 +304,24 @@ for l=2:1:7
     %ylim([0 16])
     %ylabel('DOR')
     %figure('Position', [100 100 800 400]);
-
+        % sens og spec plot 
       subplot(1,3,1)
-      plot(x,likelihood_data([spand],5))
+      plot(x,likelihood_data([spand],5),'-','color','r')
       hold on 
-      plot(x,likelihood_data([spand],8))
+      plot(x,likelihood_data([spand],8),'-','color','b')
       xlabel(Xstr)
       legend('Sensitivity','Specificity')
       grid on
       ylabel('Value')
       ylim([-0.1 1.1])
       
+      % ROC plot
       subplot(1,3,[2,3])
         scatter(likelihood_data(spand,7), likelihood_data(spand,5),'.','r')
         hold on 
         plot([0 1], [0 1],'color',[0,0,0])          %random chance
         hold on 
-        plot([0.5 0], [0.5 1],'--','color','b');      %optimal line
+        plot([0.5 0], [0.5 1],'--','color','m');      %optimal line
         xlabel('1-specificity')
         ylabel('Sensitivity')
         legend('ROC','Random chance', 'Sensitivity = specificity')
@@ -329,7 +330,7 @@ for l=2:1:7
         axis([0 1 0 1])
         annotation('textbox', [x_title, 0.91, 0.1, 0.1], 'String', titlestr, 'EdgeColor', 'none','FontSize',16)
         %annotation('text',0.7,0.2,'String','y = x ')
-        text(0.5,0.2,txt)
+        text(0.25,0.2,txt)
         
         %annotation('arrow',[0.5 1],[0.5 1])
         %t = annotation('textbox');
@@ -339,46 +340,135 @@ for l=2:1:7
 
 end 
 
-%%
-clc
-    for i=1:1:length(likelihood_data)
-        laengder(i)=norm([likelihood_data(i,7), 1-likelihood_data(i,5)]);
+
+
+
+
+%% Få 2. ROC kurve ind i plotsne
+% figure der skal redigeres: 
+%figur: 
+%8 -amplitude 
+%7- areal 
+%6 - and
+%5 - OR 
+
+% 5 - OR 
+figure(5), subplot(1,3,1);
+x=[10 20 30 40 50 60 70 80];
+spand = [4:11];
+hold on
+plot(x,likelihood_data_MED_dur_krav(spand,5),'--','color','r')      % sensitivitet MED dur krav
+hold on 
+plot(x,likelihood_data_MED_dur_krav(spand,8),'--','color','b')     % specificitet MED dur krav
+
+legend('Sens.','Spec.', 'sens. p-dur.>120 ms', 'spec. p-dur>120 ms')
+      
+subplot(1,3,[2,3])
+hold on
+scatter(likelihood_data_MED_dur_krav(spand,7), likelihood_data_MED_dur_krav(spand,5),'x','r')
+legend('ROC','Random chance', 'Sensitivity = specificity', 'ROC p-dur>120 ms')
+
+%6 - and
+figure(6), subplot(1,3,1);
+x=[10 20 30 40 50 60 70 80];
+spand = [12:19];
+hold on
+plot(x,likelihood_data_MED_dur_krav(spand,5),'--','color','r')      % sensitivitet MED dur krav
+hold on 
+plot(x,likelihood_data_MED_dur_krav(spand,8),'--','color','b')     % specificitet MED dur krav
+
+legend('Sens.','Spec.', 'sens. p-dur.>120 ms', 'spec. p-dur>120 ms')
+      
+subplot(1,3,[2,3])
+hold on
+scatter(likelihood_data_MED_dur_krav(spand,7), likelihood_data_MED_dur_krav(spand,5),'x','r')
+legend('ROC','Random chance', 'Sensitivity = specificity', 'ROC p-dur>120 ms')
+
+
+%7- areal 
+figure(7), subplot(1,3,1);
+x=10:10:2000;
+spand = [20:219];
+hold on
+plot(x,likelihood_data_MED_dur_krav(spand,5),'--','color','r')      % sensitivitet MED dur krav
+hold on 
+plot(x,likelihood_data_MED_dur_krav(spand,8),'--','color','b')     % specificitet MED dur krav
+
+legend('Sens.','Spec.', 'sens. p-dur.>120 ms', 'spec. p-dur>120 ms')
+      
+subplot(1,3,[2,3])
+hold on
+scatter(likelihood_data_MED_dur_krav(spand,7), likelihood_data_MED_dur_krav(spand,5),'x','r')
+legend('ROC','Random chance', 'Sensitivity = specificity', 'ROC p-dur>120 ms')
+
+
+%8 -amplitude 
+figure(8), subplot(1,3,1);
+x=2:2:100;
+spand = [220:269];
+hold on
+plot(x,likelihood_data_MED_dur_krav(spand,5),'--','color','r')      % sensitivitet MED dur krav
+hold on 
+plot(x,likelihood_data_MED_dur_krav(spand,8),'--','color','b')     % specificitet MED dur krav
+
+legend('Sens.','Spec.', 'sens. p-dur.>120 ms', 'spec. p-dur>120 ms')
+      
+subplot(1,3,[2,3])
+hold on
+scatter(likelihood_data_MED_dur_krav(spand,7), likelihood_data_MED_dur_krav(spand,5),'x','r')
+legend('ROC','Random chance', 'Sensitivity = specificity', 'ROC p-dur>120 ms')
+
+
+%% Plot alle best results in one plot. 
+close all
+figure; 
+x=[1-0.9962 1-0.9393 1-0.6159 1-0.9544 1-0.8281 1-0.7613];
+y=[0.0617 0.2473 0.6613 0.2021 0.3947 0.4654];
+scatter(x(1),y(1),'*','k')
+hold on 
+scatter(x(2:6),y(2:6),'*','r')
+for i=1:1:length(x)
+    switch i
+        case 1
+            txt='  P0.1'
+        case 2 
+            txt='  P0.2'
+        case 3
+            txt='  P0.3'
+        case 4
+            txt='  P0.4'
+        case 5
+            txt='  P0.5'
+        case 6
+            txt='  P0.6'
     end
-    
-for l=2:1:7
-    spand = [opdeling(l-1):opdeling(l)-1]; 
-        [M,i]=min(laengder(spand(1):spand(end)));
-        spand(i)
+    text(x(i),y(i),txt)
+    hold on
 end 
-
-%% plot
-figure;
-stem(likelihood_data(:,11))
-legend('DOR')
-sens = 0.15;
-spec = 0.9; 
-for i=1:1:length(likelihood_data)
-    if likelihood_data(i,5)>sens && likelihood_data(i,8)>spec
-        hold on
-        stem(i,likelihood_data(i,11),'r')
-    end
-end
+plot([0 1], [0 1],'color',[0,0,0])          %random chance
+hold on 
+plot([0.5 0], [0.5 1],'--','color','m');      %optimal line
+xlabel('1-specificity')
+ylabel('Sensitivity')
+title('ROC across methods')
+legend('ROC for P0.1','ROC for all novel methods','Random chance', 'Sensitivity = specificity')
+grid on 
+axis equal
+axis([0 1 0 1])
 
 
-figure;
-stem(likelihood_data(:,9))
-legend('LR+')
-
-figure;
-stem(likelihood_data(:,10))
-legend('LR-')
 
 
-%% 
-diff=0;
+%% AUC for række 4-11 
+
 for i=4:1:11
-   diff(i) = likelihood_data(i,5)-likelihood_data(i,8);
+    a = sqrt(2);
+    b = sqrt(((1-likelihood_data_UDEN_dur_krav(i,7))^2)+((1-likelihood_data_UDEN_dur_krav(i,5))^2));
+    c = sqrt((likelihood_data_UDEN_dur_krav(i,7)^2)+(likelihood_data_UDEN_dur_krav(i,5))^2);
+    p = (a+b+c)/2;
+   AUC(i)= sqrt(p*(p-a)*(p-b)*(p-c))
 end
 
-diff
+
+
 
