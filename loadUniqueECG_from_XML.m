@@ -19,7 +19,7 @@ uniqueECGs = struct('ID','','ECGs',0,'dateTimeAcq','','fileName','','POn',0,'POf
 for j=1:size(uniqueIDs,1)
     ID = uniqueIDs(j,:);
     uniqueECGs(j).ID=ID;
-    k = 1;
+    k = 1;%Counter for a specific person.
     for i=1:length(XML)
         if(XML(i).TestInfo.PatientID == ID)
             uniqueECGs(j).ECGs(k,1:600,1:12) = XML(i).MedianECG.ECG12Leads; %All 12 lead ecgs.

@@ -1,5 +1,5 @@
 function [detectionOutput] = biphasicPseudoLeadDetectionMethod(data,  degreeSpan, andOrModifier )
-% detectionOutput er en variabel, som med “1” eller “0” indikerer om metoden har fundet den givne karakteristika.
+% detectionOutput er en variabel, som med 1 eller 0 indikerer om metoden har fundet den givne karakteristika.
 % Data: biphasic_p_wave-matrice som er X*18 stor (X=antal subjekter) 
 % DegreeSpan: plus/minus gradspænd omkring P0, maks 80. Min 0.
 % andOrModifier: modtager 0 = OR og 1 = AND
@@ -25,6 +25,8 @@ switch(degreeSpan)
         P = [1,2,3,4,5,6,7,8,12,13,14,15,16,17,18];
     case 80
         P = [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18];
+    case 90
+        P = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
 end
 
 

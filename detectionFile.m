@@ -1,11 +1,23 @@
 % funktionen for detektion ved brug af fil med ECG (hvor kolonner er leads, og rækker er samples)  
 
 function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b, p_prime_ampl] = detectionFile(ecg, POnset, POffset)   
+%Purpose: Calculate biphasic p-waves, sum(size) of positive wave and
+%sum(size) of negative wave, gives coefficients a and b of regression line
+%for p-wave and p_prime_ampl for largest negative amplitude of P prime.
 
+%OUTPUT:
 % p_iab kan være 0 eller 1 og indikere om subjekt har partiel IAB. 
 % biphasic_p_wave er en 1*M vektor og angiver om p-bølgen er bifasisk i henholdvis ecg(:,1), ecg(:,2) osv....
 % sum_p_loop er den den integrerede p-loop(den positive del) ift regressionslinjen i enheden [mikroV*mS]
 % sum_p_inv_loop er den den integrerede p'-loop(den negative del) ift regressionslinjen i enheden [mikroV*mS]
+% a: Slope of the regression line in p-wave.
+% b: b-coefficient of the regression line in the p-wave
+% p_prime_ampl: Amplitude of p-prime (is negative)
+
+%INPUT:
+%ecg: ECG with leads in columns for ONE person only.
+%Ponset: Onset of p-wave (=1 if p-wave is given in "ecg")
+%POffset: Offset of p-wave (=end if p-wave is given in "ecg")
 
 P=[POnset POffset];       % Vektor med P_onset og P_Offset
 
@@ -51,7 +63,7 @@ sum_p_inv_loop(nr) = 0;                         % integrallet af den negative P
 
     %NYT: 
   for i=2:1:length(P_ecg_aligned)
-    sum_p_midl = (trapz(P_ecg_aligned(i-1:i))/500)*1000;
+    sum_p_midl = (trapz(P_ecg_aligned(i-1:i))/500)*1000;%Divide by 500(Fs) and times 1000 gives �V*ms
     
     if sum_p_midl >=0
         sum_p_loop(nr) = sum_p_loop(nr) + sum_p_midl;
