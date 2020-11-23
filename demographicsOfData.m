@@ -11,25 +11,6 @@ Fs = 500;
 %load('S:\IAB-data\No_AF_ever_XML_loaded.mat')
 XML = No_AF_ever_XML_loaded;
 
-%Removing NaN entries:
-count = 0;
-i = 1;
-while i<=length(XML)
-    if isnan(XML(i).TestInfo.POffset)
-        XML(i)=[];
-        count = count +1;
-    elseif isnan(XML(i).TestInfo.PatientAge)
-        XML(i)=[];
-        count = count +1;
-    elseif ~(strcmp(XML(i).TestInfo.Gender, 'MALE') || strcmp(XML(i).TestInfo.Gender, 'FEMALE'))
-        XML(i)=[];
-        count = count +1;
-    else
-        i = i+1;%Only increase i when no set is removed.
-    end
-end
-
-
 totalCountNoAfEver = length(XML);
 
 agesNoAFEver = zeros(length(XML),1); %In years
