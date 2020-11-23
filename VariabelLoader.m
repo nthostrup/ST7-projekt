@@ -1,25 +1,66 @@
-%% kÃ¸r alle funktionerne for data i en mappe 
-%USE: LOAD XML MANUALLY, SET XML = TO THIS DATA (L. 9):
+%% Select folder to load files from
+clear all;
+close all; 
 
-% beregning af Poffset:
+datafiledir='S:\IAB-data\AF-last-normal-ECG';
+xmlfiles=dir(fullfile(datafiledir,'*xml'));
 
-%load() %% insert file
+%% Clean datafiles to get rid of corrupted data
+tic
 
+for i = 1:1:length(xmlfiles)
+%Angiv den konkrete fil der skal køres i scriptet ved index af xmlfiler
+XML(i) = XMLECGParser(xmlfiles(i).name);  
+end
+toc
     % beregn nu p-off
-XML = No_AF_ever_XML_loaded; 
+%% 
 disp('starter')
 %Removing NaN entries:
-count = 0;
+countNoPonorPoff = 0;
+countNoAge = 0;
+countNoGender = 0;
+countInsignificantPwave = 0;
 i = 1;
 while i<=length(XML)
-    if isnan(XML(i).TestInfo.POffset)
+    if isnan(XML(i).TestInfo.POffset) || isnan(XML(i).TestInfo.POnset)
         XML(i)=[];
-        count = count +1;
+        countNoPonorPoff = countNoPonorPoff +1;
+        continue;
+    else %Calc only if pon/poff is available
+        ecg12 = XML(i).MedianECG.ECG12Leads;
+        pOn = XML(i).TestInfo.POnset;
+        pOff = XML(i).TestInfo.POffset;
+
+        II_Ploop = ecg12(pOn:pOff,2);         % det oprindelige p-loop for given lead
+        III_Ploop = ecg12(pOn:pOff,3);         % det oprindelige p-loop for given lead
+        aVF_Ploop = ecg12(pOn:pOff,6);         % det oprindelige p-loop for given lead
+
+        II_Ploop = alignPloopWithRegression(II_Ploop);
+        III_Ploop = alignPloopWithRegression(III_Ploop);
+        aVF_Ploop = alignPloopWithRegression(aVF_Ploop);
+    end
+    
+    if isnan(XML(i).TestInfo.PatientAge) || (XML(i).TestInfo.PatientAge < 18)
+        XML(i)=[];
+        countNoAge = countNoAge +1;
+    elseif ~(strcmp(XML(i).TestInfo.Gender, 'MALE') || strcmp(XML(i).TestInfo.Gender, 'FEMALE'))
+        XML(i)=[];
+        countNoGender = countNoGender +1;
+    elseif ~((max(II_Ploop) > 20 || min(II_Ploop) < -20) ...
+    || (max(III_Ploop) > 20 || min(III_Ploop) < -20) ...
+    || (max(aVF_Ploop) > 20 || min(aVF_Ploop) < -20))
+        XML(i)=[];
+        countInsignificantPwave = countInsignificantPwave +1;
     else
         i = i+1;%Only increase i when no set is removed.
     end
 end
-disp("Removed " + count + " datasets");
+totalCount = countNoPonorPoff + countNoAge + countNoGender + countInsignificantPwave;
+%No_AF_ever_XML_loaded = XML;
+AF_last_normal_ECG_XML_loaded = XML;
+
+disp("Removed " + totalCount + " datasets");
 %% 
 %Preallocation of variables:
     Off = zeros(1,length(XML));
