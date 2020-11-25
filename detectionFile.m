@@ -54,13 +54,14 @@ end
 p_prime_ampl(nr)=min(P_ecg_aligned);
 
 % beregning af integralet af p-loopet
+continous_p_wave=0;
+continous_inv_p_wave=0; 
 sum_p_loop(nr) = 0;                             % Integralet af P
 sum_p_inv_loop(nr) = 0;                         % integrallet af den negative P
 % hvis trapez-integralet er >=0 summeres det til sum_p_loop. 
 % hvis trapez-integralet er <0 summeres det til sum_p_inv_loop. 
 % her divideres med samplefrekvensen for at få mikrovolt*S. Derefter ganges med 
 % 1000ms/s for at omregne enheden til mikroVolt*ms.   
-
     %NYT: 
    for i=2:1:length(P_ecg_aligned)
 
