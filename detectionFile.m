@@ -62,14 +62,28 @@ sum_p_inv_loop(nr) = 0;                         % integrallet af den negative P
 % 1000ms/s for at omregne enheden til mikroVolt*ms.   
 
     %NYT: 
-  for i=2:1:length(P_ecg_aligned)
-    sum_p_midl = (trapz(P_ecg_aligned(i-1:i))/500)*1000;%Divide by 500(Fs) and times 1000 gives µV*ms
-    
-    if sum_p_midl >=0
-        sum_p_loop(nr) = sum_p_loop(nr) + sum_p_midl;
+   for i=2:1:length(P_ecg_aligned)
+
+    if sign(P_ecg_aligned(i)) < sign(P_ecg_aligned(i-1)) %skifter fra pos til neg bølge
+        continous_p_wave = 0; %start forfra med at tælle
     end 
-    if sum_p_midl<0
-       sum_p_inv_loop(nr) = sum_p_inv_loop(nr) + sum_p_midl;
+    if sign(P_ecg_aligned(i)) > sign(P_ecg_aligned(i-1)) %skifter fra neg til pos bølge
+        continous_inv_p_wave = 0; %start forfra med at tælle 
+    end 
+    
+    sum_p_midl = (trapz(P_ecg_aligned(i-1:i))/500)*1000;%Divide by 500(Fs) and times 1000 gives µV*ms 
+    
+    if sum_p_midl >= 0
+        continous_p_wave = continous_p_wave+sum_p_midl;
+        if continous_p_wave > sum_p_loop(nr) %gemmer den største positive bølge 
+            sum_p_loop(nr) = continous_p_wave;
+        end
+     
+    elseif sum_p_midl<0
+       continous_inv_p_wave = continous_inv_p_wave+sum_p_midl;
+       if continous_inv_p_wave < sum_p_inv_loop(nr) %gemmer den største negative bølge 
+            sum_p_inv_loop(nr) = continous_inv_p_wave;
+       end
     end
   end
 % Enheden for sum_p_loop og sum_p_inv_loop er mikroVolt*ms.

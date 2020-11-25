@@ -14,7 +14,7 @@ XML(i) = XMLECGParser(xmlfiles(i).name);
 end
 toc
     % beregn nu p-off
-%% 
+%% remove corrupted files
 disp('starter')
 %Removing NaN entries:
 countNoPonorPoff = 0;
@@ -112,7 +112,7 @@ infECG=[XML(i).MedianECG.II,XML(i).MedianECG.aVF,XML(i).MedianECG.III]; %infECG 
 end 
 disp('detektion af konv. inf leads er beregnet')
     % beregning af LoadUniqueEcgs
-uniqueECGS=loadUniqueECG_from_XML(XML);
+%uniqueECGS=loadUniqueECG_from_XML(XML);
 disp('done!')
 
 

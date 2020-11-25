@@ -1,6 +1,6 @@
 % funktionen for detektion ved brug af fil med ECG (hvor kolonner er leads, og rÃ¦kker er samples)  
 
-function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b, p_prime_ampl] = detectionFile_contWave(ecg, POnset, POffset)   
+function[p_iab, biphasic_p_wave, sum_p_loop, sum_p_inv_loop, a, b, p_prime_ampl] = detectionFile(ecg, POnset, POffset)   
 %Purpose: Calculate biphasic p-waves, sum(size) of positive wave and
 %sum(size) of negative wave, gives coefficients a and b of regression line
 %for p-wave and p_prime_ampl for largest negative amplitude of P prime.
@@ -54,8 +54,6 @@ end
 p_prime_ampl(nr)=min(P_ecg_aligned);
 
 % beregning af integralet af p-loopet
-continous_p_wave=0;
-continous_inv_p_wave=0; 
 sum_p_loop(nr) = 0;                             % Integralet af P
 sum_p_inv_loop(nr) = 0;                         % integrallet af den negative P
 % hvis trapez-integralet er >=0 summeres det til sum_p_loop. 
@@ -65,27 +63,13 @@ sum_p_inv_loop(nr) = 0;                         % integrallet af den negative P
 
     %NYT: 
   for i=2:1:length(P_ecg_aligned)
-
-    if sign(P_ecg_aligned(i)) < sign(P_ecg_aligned(i-1)) %skifter fra pos til neg bølge
-        continous_p_wave = 0; %start forfra med at tælle
-    end 
-    if sign(P_ecg_aligned(i)) > sign(P_ecg_aligned(i-1)) %skifter fra neg til pos bølge
-        continous_inv_p_wave = 0; %start forfra med at tælle 
-    end 
+    sum_p_midl = (trapz(P_ecg_aligned(i-1:i))/500)*1000;%Divide by 500(Fs) and times 1000 gives µV*ms
     
-    sum_p_midl = (trapz(P_ecg_aligned(i-1:i))/500)*1000;%Divide by 500(Fs) and times 1000 gives µV*ms 
-    
-    if sum_p_midl >= 0
-        continous_p_wave = continous_p_wave+sum_p_midl;
-        if continous_p_wave > sum_p_loop(nr) %gemmer den største positive bølge 
-            sum_p_loop(nr) = continous_p_wave;
-        end
-     
-    elseif sum_p_midl<0
-       continous_inv_p_wave = continous_inv_p_wave+sum_p_midl;
-       if continous_inv_p_wave < sum_p_inv_loop(nr) %gemmer den største negative bølge 
-            sum_p_inv_loop(nr) = continous_inv_p_wave;
-       end
+    if sum_p_midl >=0
+        sum_p_loop(nr) = sum_p_loop(nr) + sum_p_midl;
+    end 
+    if sum_p_midl<0
+       sum_p_inv_loop(nr) = sum_p_inv_loop(nr) + sum_p_midl;
     end
   end
 % Enheden for sum_p_loop og sum_p_inv_loop er mikroVolt*ms.
