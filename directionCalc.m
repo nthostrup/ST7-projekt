@@ -31,12 +31,12 @@ end
 % PC1_direction er nu beregnet til en 3*(antal af subjekter) matrice. 
 
 % plot 
-close all
-scatter3(PC1_direction(1,:),PC1_direction(2,:),PC1_direction(3,:))
-hold on 
-str = 1;
-plot3([-str str],[0 0],[0 0],'k',[0 0],[-str str],[0 0],'k',[0 0],[0 0],[-str str],'k'); % plotter et kryds i 3D plottet
-text(str,0,0,'Left'); text(-str,0,0,'Right'); text(0,str,0,'Posterior'); text(0,-str,0,'Anterior'); text(0,0,str,'Superior'); text(0,0,-str,'Inferior');
+%close all
+%scatter3(PC1_direction(1,:),PC1_direction(2,:),PC1_direction(3,:))
+%hold on 
+%str = 1;
+%plot3([-str str],[0 0],[0 0],'k',[0 0],[-str str],[0 0],'k',[0 0],[0 0],[-str str],'k'); % plotter et kryds i 3D plottet
+%text(str,0,0,'Left'); text(-str,0,0,'Right'); text(0,str,0,'Posterior'); text(0,-str,0,'Anterior'); text(0,0,str,'Superior'); text(0,0,-str,'Inferior');
 
 
 % means og SD 
@@ -48,14 +48,14 @@ PC1_direction_total_mean = [x_direction_mean,y_direction_mean,z_direction_mean];
 x_direction_SD = std(PC1_direction(1,1:end));
 y_direction_SD = std(PC1_direction(2,1:end));
 z_direction_SD = std(PC1_direction(3,1:end));
-PC1_direction_total_SD = [x_direction_SD, y_direction_SD, z_direction_SD]
+PC1_direction_total_SD = [x_direction_SD, y_direction_SD, z_direction_SD];
 
-hold on 
-plot3([0 x_direction_mean], [0 y_direction_mean], [0 z_direction_mean])
-hold on
-Linewidth = 2;
-plot3([x_direction_mean-x_direction_SD x_direction_mean+x_direction_SD],[y_direction_mean y_direction_mean],[z_direction_mean z_direction_mean],'k','LineWidth',Linewidth,'Marker','|')
-plot3([x_direction_mean x_direction_mean],[y_direction_mean-y_direction_SD y_direction_mean+y_direction_SD],[z_direction_mean z_direction_mean],'k','LineWidth',Linewidth,'Marker','|')
-plot3([x_direction_mean x_direction_mean],[y_direction_mean y_direction_mean],[z_direction_mean-z_direction_SD z_direction_mean+z_direction_SD],'k','LineWidth',Linewidth,'Marker','|')
+%hold on 
+%plot3([0 x_direction_mean], [0 y_direction_mean], [0 z_direction_mean])
+%hold on
+%Linewidth = 2;
+%plot3([x_direction_mean-x_direction_SD x_direction_mean+x_direction_SD],[y_direction_mean y_direction_mean],[z_direction_mean z_direction_mean],'k','LineWidth',Linewidth,'Marker','|')
+%plot3([x_direction_mean x_direction_mean],[y_direction_mean-y_direction_SD y_direction_mean+y_direction_SD],[z_direction_mean z_direction_mean],'k','LineWidth',Linewidth,'Marker','|')
+%plot3([x_direction_mean x_direction_mean],[y_direction_mean y_direction_mean],[z_direction_mean-z_direction_SD z_direction_mean+z_direction_SD],'k','LineWidth',Linewidth,'Marker','|')
 
 end 
