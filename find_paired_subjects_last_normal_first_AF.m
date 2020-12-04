@@ -3,7 +3,6 @@ load('No_AF_ever_XML_loaded.mat')
 
 %% beregn duration i dage
 XML = No_AF_ever_XML_loaded;
-counter = 0;
 
 for i=1:length(XML) 
    if  strcmp(XML(i).TestInfo.Gender, 'MALE')
@@ -11,24 +10,14 @@ for i=1:length(XML)
    elseif strcmp(XML(i).TestInfo.Gender, 'FEMALE')
        NoAF_gender(i) = 1;
    else
-       NoAF_gender(i) = 3;          %% skriv 3 hvis deres køn er N/A
-       counter = counter +1;
-%        XML(i) = [];
-%        indexesRemoved(k)=i+count;
-%        count = count+1;
-%        k=k+1;
-       X_disp = sprintf('Sample %i removed',i);
-       disp(X_disp)
+       disp('error')
    end 
- end
- 
+end
 
  for j = 1:length(XML)
         if isnan(XML(j).TestInfo.PatientAge)
-            NoAF_age(j) = 0;
-            counter = counter +1;
-            Y_disp = sprintf('Sample %i removed',j);
-            disp(Y_disp)
+            %NoAF_age(j) = 0;
+            disp('Error')
 %             XML(i) = [];
 %             indexesRemoved(k)=i+count;
 %             count = count+1;
@@ -64,12 +53,13 @@ NoAF_age = NoAF_age';
 NoAF_duration = NoAF_duration';
 
  %% Detection på No AF Ever gruppen
-load('No_AF_ever_variables_all_variables.mat')
+load('Variables_for_NO_AF_Ever.mat')
 
  %%
 % 
 % % Konventionel  - få integreret p>120 ms
-% [NoAF_konv_detection] = konventionalDetectionMethod(konv_biphasic_p_wave, konv_p_iab);
+[NoAF_konv_detection] = konventionalDetectionMethod(konv_biphasic_p_wave, konv_p_iab);
+NoAF_konv_detection = NoAF_konv_detection';
 % NoAF_konv_detection = NoAF_konv_detection';
 % Biphasic P0
 % [NoAF_biphasic_90_p0_detection] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,90,0);
@@ -87,33 +77,33 @@ load('No_AF_ever_variables_all_variables.mat')
 % [NoAF_amplitude_10] = amplitudeDetectionMethod(p_prime_ampl, 10);
 % NoAF_amplitude_10 = NoAF_amplitude_10';
 %%
-NoAF_biphasicleads = biphasic_p_wave;
-%%
 %Alle Biphasic +/- AND metoder
-span = [0;10;20;30;40;50;60;70;80;90];
+%span = [10;20;40;80;160;320;640;1280;2580];
+span = [10;20;30;40;50;60;70;80;90;100];
+%span = [0;10;20;30;40;50;60;70;80;90];
 for i=1:length(span)
-[NoAF_biphasic_AND_detection(:,i)] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,span(i),1);
+[NoAF_amplitude_detection(:,i)] = amplitudeDetectionMethod(p_prime_ampl, span(i));
 end
 %NoAF_biphasic_AND_detection = NoAF_biphasic_AND_detection';
 %%
 NoAF_event = zeros(length(XML),1);
  
-NoAF_matrix = [NoAF_event NoAF_duration NoAF_age NoAF_gender NoAF_biphasic_AND_detection];
+NoAF_matrix = [NoAF_event NoAF_duration NoAF_age NoAF_gender NoAF_konv_detection];
 
 
 %% Find tid mellem last normal og first AF ECG gruppen
-%load('AF_first_ECG.mat')
-%load('AF_last_normal_ECG_XML_loaded.mat')
+load('AF_first_ECG.mat')
+load('AF_last_normal_ECG_XML_loaded.mat')
 
 
 %% Fjern data med kun én tid og beregn duration i dage
-[intersectedData] = intersectXMLsOnIDs(AF_first_ECG,AF_last_normal_ECG_XML_loaded);
+%[intersectedData] = intersectXMLsOnIDs(AF_first_ECG,AF_last_normal_ECG_XML_loaded);
 %%
-AF_index = [intersectedData.IndexLastNormal]';
-AF_duration = [intersectedData.duration]';
+%AF_index = [intersectedData.IndexLastNormal]';
+%AF_duration = [intersectedData.duration]';
  
 %% Tjek for gender og alder N/A
-XML = AF_last_normal_ECG_XML_loaded(AF_index);
+%XML = AF_last_normal_ECG_XML_loaded(AF_index);
 %%
 
 for i=1:length(XML) 
@@ -123,39 +113,27 @@ for i=1:length(XML)
    elseif strcmp(XML(i).TestInfo.Gender, 'FEMALE')
        AF_gender(i) = 1;
    else
-       AF_gender(i) = 3;          %% skriv 3 hvis deres køn er N/A
-       counter = counter +1;
-       Z_disp = sprintf('Sample %i removed',i);
-       disp(Z_disp)
+       %AF_gender(i) = 3;          %% skriv 3 hvis deres køn er N/A
+       disp('Error')
    end 
 end
- 
-
 
  for j = 1:length(XML)
         if isnan(XML(j).TestInfo.PatientAge)
             AF_age(j) = 0;
-            counter = counter +1;
-            A_disp = sprintf('Sample %i removed',j);
-            disp(A_disp)
+            disp('Error')
         else
            AF_age(j) = XML(j).TestInfo.PatientAge;
         end
  end
 
-
-
-
-
-%%
  AF_gender = AF_gender';
  AF_age = AF_age';
 
 %% Detection på AF gruppen    
-load('AF_last_normal_ECG_GEpoffset_workspace.mat')
+load('Variables_for_AF-last-normal.mat')
 %%
 biphasic_p_wave = biphasic_p_wave(AF_index,:);
-AF_biphasicleads = biphasic_p_wave;
 
 %%
 % % Konventionel  - få integreret p>120 ms
@@ -170,31 +148,84 @@ AF_biphasicleads = biphasic_p_wave;
 
 
 %Alle Biphasic +/- AND metoder
-span = [0;10;20;30;40;50;60;70;80;90];
+%span = [10;20;40;80;160;320;640;1280;2580];
+span = [10;20;30;40;50;60;70;80;90;100];
+%span = [0;10;20;30;40;50;60;70;80;90];
 for i=1:length(span)
-[AF_biphasic_AND_detection(:,i)] = biphasicPseudoLeadDetectionMethod(biphasic_p_wave,span(i),1);
+[AF_amplitude_detection(:,i)] = amplitudeDetectionMethod(p_prime_ampl(AF_index), span(i));
 end%AF_biphasic_area_detection = AF_biphasic_area_detection;
 
 %% Lav AF matrice
 
-AF_event = ones(length(AF_duration),1);
+AF_event = ones(length(AF_biphasic_AND_detection),1);
+
+[AF_konv_detection] = konventionalDetectionMethod(konv_biphasic_p_wave(AF_index,:), konv_p_iab(AF_index));
+AF_konv_detection = AF_konv_detection';
 
 %AF_matrix = [AF_event AF_duration AF_konv_detection AF_biphasic_p0_detection AF_biphasic_p0_OR_50_detection AF_biphasic_p0_AND_10_detection AF_area_2microV AF_amplitude_10];
-AF_matrix = [AF_event AF_duration AF_age AF_gender AF_biphasic_AND_detection];
+AF_matrix = [AF_event AF_duration AF_age AF_gender AF_konv_detection];
 
 %% Combine AF and No AF matrices
-%AND_matrix = [AF_matrix;NoAF_matrix];
-
-%Age_matrix = [AF_age;NoAF_age];
-%Gender_matrix = [AF_gender;NoAF_gender];
-biphasic_matrix = [AF_biphasicleads;NoAF_biphasicleads];
+konv_matrix = [AF_matrix;NoAF_matrix];
 
 %%
 % Biphasic_OR_matrix = [AF_matrix;NoAF_matrix];                         % 80;160;320;640;1280;2560
-% %
-% 
-P0AND_table = array2table(AND_matrix, 'VariableNames',{'Event','Duration','Age','Gender','0','10','20','30','40','50','60','70','80','90'});
- writetable(P0AND_table,'P0AND_table2.csv')
+% '0','10','20','30','40','50','60','70','80','90'
+% '10','20','30','40','50','60','70','80','90','100'
+% 'P0','P1','P2','P3','P4','P5','P6','P7','P8','P9','P28','P29','P30','P31','P32','P33','P34','P35'
+konv_table = array2table(konv_matrix, 'VariableNames',{'Event','Duration','Age','Gender','Konventional'});
+writetable(konv_table,'konv_table.csv')
 
+%% 
+AND_matrix_for_SPSS=AND_matrix(:,1);
 
+% for i=1:length(AND_matrix)
+% if  AND_matrix(i,11)==1
+%     AND_matrix_for_SPSS(i,2)=10; 
+% elseif AND_matrix(i,10)==1
+%          AND_matrix_for_SPSS(i,2)=9; 
+% elseif AND_matrix(i,9)==1
+%          AND_matrix_for_SPSS(i,2)=8; 
+% elseif AND_matrix(i,8)==1
+%          AND_matrix_for_SPSS(i,2)=7; 
+% elseif AND_matrix(i,7)==1
+%          AND_matrix_for_SPSS(i,2)=6;
+% elseif AND_matrix(i,6)==1
+%          AND_matrix_for_SPSS(i,2)=5;
+% elseif AND_matrix(i,5)==1
+%          AND_matrix_for_SPSS(i,2)=4;
+% elseif AND_matrix(i,4)==1
+%          AND_matrix_for_SPSS(i,2)=3;
+% elseif AND_matrix(i,3)==1
+%          AND_matrix_for_SPSS(i,2)=2;
+% elseif AND_matrix(i,2)==1
+%          AND_matrix_for_SPSS(i,2)=1;
+% end
+% end
 
+%% 
+AND_matrix_for_SPSS=AND_matrix(:,1);
+
+for i=1:length(AND_matrix)
+if  AND_matrix(i,2)==1
+    AND_matrix_for_SPSS(i,2)=10; 
+elseif AND_matrix(i,3)==1
+         AND_matrix_for_SPSS(i,2)=9; 
+elseif AND_matrix(i,4)==1
+         AND_matrix_for_SPSS(i,2)=8; 
+elseif AND_matrix(i,5)==1
+         AND_matrix_for_SPSS(i,2)=7; 
+elseif AND_matrix(i,6)==1
+         AND_matrix_for_SPSS(i,2)=6;
+elseif AND_matrix(i,7)==1
+         AND_matrix_for_SPSS(i,2)=5;
+elseif AND_matrix(i,8)==1
+         AND_matrix_for_SPSS(i,2)=4;
+elseif AND_matrix(i,9)==1
+         AND_matrix_for_SPSS(i,2)=3;
+elseif AND_matrix(i,10)==1
+         AND_matrix_for_SPSS(i,2)=2;
+elseif AND_matrix(i,11)==1
+         AND_matrix_for_SPSS(i,2)=1;
+end
+end
