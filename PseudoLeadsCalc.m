@@ -1,5 +1,5 @@
-function [leadprojlength, Pseudo_electrodes, numerationOfElectrodes,PC12_ratio, PC1_direction ] = PseudoLeadsCalc(VCG_in)
-%Purpose: 
+function [leadprojlength, Pseudo_electrodes, numerationOfElectrodes,PC12_ratio, PC1_direction, PC3_direction] = PseudoLeadsCalc(VCG_in)
+%% Purpose: 
 %Inputs:
     %VCG_in: VCG either full ECG or p-loop only. size: 3xSamples. !!Not arranged according to correct convention!!
 %Outputs:
@@ -27,6 +27,14 @@ if U(3,1)>0
     U(:,1) = U(:,1)*(-1); %Direction of PC1.
 end
 PC1_direction = U(:,1);
+PC3_direction = U(:,3);
+
+best_view = [1;-1;1;];
+if dot(PC3_direction,best_view)<0
+    PC3_direction = PC3_direction(:,1).*(-1);
+end
+U(:,3) = PC3_direction;
+PC3_direction = PC3_direction';
 
 PC1_from_origin=[U(1,1)*S(1,1) U(2,1)*S(1,1) U(3,1)*S(1,1)];
 PC2_from_origin=[U(1,2)*S(2,2) U(2,2)*S(2,2) U(3,2)*S(2,2)]; 
@@ -84,6 +92,7 @@ for j=1:length(P_pca) %ser kun på 180 grader. Gennemløber 180 graders leads
    
 end
 
+    
 selectedLeadsAndElectrodes = [1:10,29:36]; %Look at the span from 0-90 degrees and from 280 to 350 degrees
 
 leadprojlength = leadprojlength(selectedLeadsAndElectrodes,:);
