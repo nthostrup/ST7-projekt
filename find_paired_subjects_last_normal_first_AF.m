@@ -97,13 +97,13 @@ load('AF_last_normal_ECG_XML_loaded.mat')
 
 
 %% Fjern data med kun én tid og beregn duration i dage
-[intersectedData] = intersectXMLsOnIDs(AF_first_ECG,AF_last_normal_ECG_XML_loaded);
+%[intersectedData] = intersectXMLsOnIDs(AF_first_ECG,AF_last_normal_ECG_XML_loaded);
 %%
-AF_index = [intersectedData.IndexLastNormal]';
-AF_duration = [intersectedData.duration]';
+%AF_index = [intersectedData.IndexLastNormal]';
+%AF_duration = [intersectedData.duration]';
  
 %% Tjek for gender og alder N/A
-XML = AF_last_normal_ECG_XML_loaded(AF_index);
+%XML = AF_last_normal_ECG_XML_loaded(AF_index);
 %%
 
 for i=1:length(XML) 
@@ -157,7 +157,7 @@ end%AF_biphasic_area_detection = AF_biphasic_area_detection;
 
 %% Lav AF matrice
 
-AF_event = ones(length(AF_duration),1);
+AF_event = ones(length(AF_biphasic_AND_detection),1);
 
 [AF_konv_detection] = konventionalDetectionMethod(konv_biphasic_p_wave(AF_index,:), konv_p_iab(AF_index));
 AF_konv_detection = AF_konv_detection';
@@ -176,5 +176,56 @@ konv_matrix = [AF_matrix;NoAF_matrix];
 konv_table = array2table(konv_matrix, 'VariableNames',{'Event','Duration','Age','Gender','Konventional'});
 writetable(konv_table,'konv_table.csv')
 
+%% 
+AND_matrix_for_SPSS=AND_matrix(:,1);
 
+% for i=1:length(AND_matrix)
+% if  AND_matrix(i,11)==1
+%     AND_matrix_for_SPSS(i,2)=10; 
+% elseif AND_matrix(i,10)==1
+%          AND_matrix_for_SPSS(i,2)=9; 
+% elseif AND_matrix(i,9)==1
+%          AND_matrix_for_SPSS(i,2)=8; 
+% elseif AND_matrix(i,8)==1
+%          AND_matrix_for_SPSS(i,2)=7; 
+% elseif AND_matrix(i,7)==1
+%          AND_matrix_for_SPSS(i,2)=6;
+% elseif AND_matrix(i,6)==1
+%          AND_matrix_for_SPSS(i,2)=5;
+% elseif AND_matrix(i,5)==1
+%          AND_matrix_for_SPSS(i,2)=4;
+% elseif AND_matrix(i,4)==1
+%          AND_matrix_for_SPSS(i,2)=3;
+% elseif AND_matrix(i,3)==1
+%          AND_matrix_for_SPSS(i,2)=2;
+% elseif AND_matrix(i,2)==1
+%          AND_matrix_for_SPSS(i,2)=1;
+% end
+% end
 
+%% 
+AND_matrix_for_SPSS=AND_matrix(:,1);
+
+for i=1:length(AND_matrix)
+if  AND_matrix(i,2)==1
+    AND_matrix_for_SPSS(i,2)=10; 
+elseif AND_matrix(i,3)==1
+         AND_matrix_for_SPSS(i,2)=9; 
+elseif AND_matrix(i,4)==1
+         AND_matrix_for_SPSS(i,2)=8; 
+elseif AND_matrix(i,5)==1
+         AND_matrix_for_SPSS(i,2)=7; 
+elseif AND_matrix(i,6)==1
+         AND_matrix_for_SPSS(i,2)=6;
+elseif AND_matrix(i,7)==1
+         AND_matrix_for_SPSS(i,2)=5;
+elseif AND_matrix(i,8)==1
+         AND_matrix_for_SPSS(i,2)=4;
+elseif AND_matrix(i,9)==1
+         AND_matrix_for_SPSS(i,2)=3;
+elseif AND_matrix(i,10)==1
+         AND_matrix_for_SPSS(i,2)=2;
+elseif AND_matrix(i,11)==1
+         AND_matrix_for_SPSS(i,2)=1;
+end
+end

@@ -90,8 +90,8 @@ for n=1:2
 end
 
 %% Plot
-for n=1:2
-    subplot(1,2,n)
+for n=2
+    %subplot(1,2,n)
     plot(OR_curve_falsePos(n,:),OR_curve_sens(n,:),'-*','LineWidth',1.5); hold on;
     plot(Amp_curve_falsePos(n,:),Amp_curve_sens(n,:),'-*','LineWidth',1.5)
     plot(Area_curve_falsePos(n,:),Area_curve_sens(n,:),'-*','LineWidth',1.5)
@@ -100,14 +100,14 @@ for n=1:2
     plot(conv_curve_falsePos(n,:),conv_curve_sens(n,:),'-*','LineWidth',1.5);
     plot([0 1],[0 1],'k','LineWidth',1)
     hold off
-    legend('OR','Amplitude','Area','P0','AND','Conventional A-IAB','Random line')
+    legend('M2:OR','M5:Amplitude','M4:Area','M1:P0','M3:AND','Conv')
     grid on;
     xlabel('1-Specificity')
     ylabel('Sensitivity')
     if n==1
-        title('ROC curves (p-wave duration >120)')
+        title('ROC curves (p-wave duration >120ms)')
     else
-        title('ROC curves (no restictions to p-wave duration)')
+        title('ROC curves') % (no restictions to p-wave duration)
     end
     axis square
 end
@@ -132,3 +132,11 @@ end
 [Amp_max,Amp_max_index]=max(Amp_curve_sens(2,:)-Amp_curve_falsePos(2,:));
 
 
+%% Make table for SPSS
+
+%Sens_falsePos_matrix=[conv_curve_sens(1,:)' conv_curve_falsePos(1,:)' P0_curve_sens' P0_curve_falsePos' OR_curve_sens' OR_curve_falsePos'];
+
+OR_matrix=[OR_curve_sens' OR_curve_falsePos'];
+
+%b=array2table(Sens_falsePos_matrix,'VariableNames',{'SensConv','FPConv','SensP0120','SensP0All','FPP0120','FPP0All','SensOR120','SensORAll','FPOR120','FPORAll'});
+%writetable(b,'ROC_table.csv')
